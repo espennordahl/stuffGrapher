@@ -16,6 +16,7 @@ class RenderAction(Action):
     def createRenderLayer(self, name):
         match = self.match + "." + name
         data = Data(match)
+        data.name = "RenderLayer"
         if self.graph:
             self.graph.addNode(data)
         return data

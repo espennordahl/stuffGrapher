@@ -10,7 +10,18 @@ class Node:
         self.attributes = {}
         self.match = match
         self.graph = None
-        self.name = "node"
+        self._name = self.__class__.__name__
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        if self.graph:
+            self.graph.renameNode(self, value)
+        else:
+            self._name = value
 
     def addAttribute(self, attribute):
         if not isinstance(attribute, Attribute):
@@ -23,3 +34,5 @@ class Node:
     def setGraph(self, graph):
         self.graph = graph
         self.graph.addNode(self)
+
+

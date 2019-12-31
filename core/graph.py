@@ -8,10 +8,21 @@ class Graph:
     def __init__(self):
         self.nodes = {}
 
-    def makeNodeNameUnique(self, node):
-        name = node.name
+    def createUniqueName(self, name):
+        """
+        Gives the node a name that is unique to the graph
+        We make node names unique in the same way as Maya/Nuke/Houidini etc,
+        by incrementing a number at the end of the name
+        """
+        ## If the name is already unique, we're good
+        if name not in self.nodes:
+            return name
+
+        ## It's not unique, so we increment a number at the end until it's unique
+        ## First we have to check if it already ends with a number,
+        ## so that "name22" increments to "name23" and not "name221"
         basename = name
-        number = 0
+        number = 1
         for i in range(0, len(name)):
             tail = name[len(name)-(i+1):]
             if tail.isnumeric():
@@ -23,11 +34,20 @@ class Graph:
         while(newname in self.nodes):
             number += 1
             newname = basename + str(number)
-        node.name = newname
+        return newname
+
+    def renameNode(self, node, newname):
+        if node not in self.nodes.values():
+            logging.error("Asked to rename a node not in the graph")
+        self.nodes.pop(node.name)
+        newname = self.createUniqueName(newname)
+        node._name = newname 
+        self.nodes[node.name] = node
 
     def addNode(self, node):
         if node not in self.nodes.values():
-            self.makeNodeNameUnique(node)
+            name = self.createUniqueName(node.name)
+            node._name = name
             self.nodes[node.name] = node
             if node.graph != self:
                 node.setGraph(self)
