@@ -1,5 +1,7 @@
 import unittest
 
+from random import random, choice
+
 from core import Graph
 
 class TestCreate(unittest.TestCase):
@@ -13,6 +15,29 @@ class TestCreate(unittest.TestCase):
         data = action.createRenderLayer("dragon")
 
         self.assertEqual(len(graph.nodes), 3)
+
+    def test_lots_of_nodes(self):
+        graph = Graph()
+        actions = ["RenderAction", "ComprenderAction"]
+        scenefiles = ["MayaFile", "NukeFile", "HoudiniFile"]
+
+        nodes = {}
+        nodes["scenes"] = []
+        nodes["actions"] = []
+
+        for x in range(0,10000):
+            r = random()
+            if nodes["scenes"] and r > 0.5:
+                node = graph.createAction(choice(actions), choice(nodes["scenes"]))
+                nodes["actions"].append(node)
+            else:
+                node = graph.createSceneFile(choice(scenefiles), "foo")
+                nodes["scenes"].append(node)
+
+        self.assertEqual(len(nodes["actions"]) + len(nodes["scenes"]), 10000)
+        self.assertEqual(len(graph.nodes), 10000)
+        for nodename in graph.nodes:
+            self.assertEqual(nodename, graph.nodes[nodename].name)
 
     def test_node_names(self):
         graph = Graph()
