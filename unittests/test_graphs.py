@@ -1,24 +1,26 @@
 import unittest
 
 from core import Graph
-from core.actions import RenderAction
-from core.scenefiles import MayaFile
 
 class TestCreate(unittest.TestCase):
     def test_create_demo(self):
-        workfile = MayaFile("anim")
+        self.assertEqual(1+1, 2)
 
     def test_create_graph(self):
         graph = Graph()
 
-        scenefile = MayaFile("lighting")
-        graph.addNode(scenefile)
+        scenefile = graph.createSceneFile("MayaFile", "lighting")
 
-        action = RenderAction(scenefile)
+        action = graph.createAction("RenderAction", scenefile)
 
         data = action.createRenderLayer("dragon")
 
         self.assertEqual(len(graph.nodes), 3)
+
+class TestSerialize(unittest.TestCase):
+    def test_simple(self):
+        graph = Graph()
+
 
 if __name__ == '__main__':
     unittest.main()

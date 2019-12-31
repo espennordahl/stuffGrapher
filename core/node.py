@@ -10,6 +10,7 @@ class Node:
         self.attributes = {}
         self.match = match
         self.graph = None
+        self.name = "node"
 
     def addAttribute(self, attribute):
         if not isinstance(attribute, Attribute):
