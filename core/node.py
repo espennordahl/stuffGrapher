@@ -1,4 +1,5 @@
 import logging
+import json
 
 from .attributes import *
 
@@ -36,6 +37,21 @@ class Node:
         if self not in graph.nodes.values():
             self.graph.addNode(self)
 
+
+    @classmethod
+    class deserialize(cls, jsonInput):
+        obj = Node(jsonInput["match"])
+        for attribute in jsonInput["attributes"]:
+            obj.addAttribute(Attribute.deserialize(jsonInput[key]))
+        return obj
+
+    def json(self):
+        root = {}
+        root["class"] = "Node"
+        root["attributes"] = {}
+        root["match"] = self.match
+        for attributes in self.attributes:
+            root["attributes"][self.attribute.name] = self.attribute.json()
 
     def __eq__(self, other):
         if self.attributes != other.attributes:
