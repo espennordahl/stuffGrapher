@@ -45,12 +45,11 @@ class Graph:
         self.nodes[node.name] = node
 
     def addNode(self, node):
-        if node not in self.nodes.values():
-            name = self.createUniqueName(node.name)
-            node._name = name
-            self.nodes[node.name] = node
-            if node.graph != self:
-                node.setGraph(self)
+        name = self.createUniqueName(node.name)
+        node._name = name
+        self.nodes[node.name] = node
+        if node.graph != self:
+            node.setGraph(self)
 
     def createSceneFile(self, classname, match):
         if not classname in dir(scenefiles):

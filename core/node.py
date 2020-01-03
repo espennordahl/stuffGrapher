@@ -33,6 +33,13 @@ class Node:
 
     def setGraph(self, graph):
         self.graph = graph
-        self.graph.addNode(self)
+        if self not in graph.nodes.values():
+            self.graph.addNode(self)
 
 
+    def __eq__(self, other):
+        if self.attributes != other.attributes:
+            return False
+        if self.match != other.match:
+            return False
+        return True

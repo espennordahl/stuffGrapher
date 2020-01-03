@@ -25,7 +25,8 @@ class TestCreate(unittest.TestCase):
         nodes["scenes"] = []
         nodes["actions"] = []
 
-        for x in range(0,10000):
+        numNodes = 2000
+        for x in range(0,numNodes):
             r = random()
             if nodes["scenes"] and r > 0.5:
                 node = graph.createAction(choice(actions), choice(nodes["scenes"]))
@@ -34,8 +35,8 @@ class TestCreate(unittest.TestCase):
                 node = graph.createSceneFile(choice(scenefiles), "foo")
                 nodes["scenes"].append(node)
 
-        self.assertEqual(len(nodes["actions"]) + len(nodes["scenes"]), 10000)
-        self.assertEqual(len(graph.nodes), 10000)
+        self.assertEqual(len(nodes["actions"]) + len(nodes["scenes"]), numNodes)
+        self.assertEqual(len(graph.nodes), numNodes)
         for nodename in graph.nodes:
             self.assertEqual(nodename, graph.nodes[nodename].name)
 
