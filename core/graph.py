@@ -3,6 +3,7 @@ import sys
 
 from core import actions
 from core import scenefiles
+from core import data
 
 class Graph:
     def __init__(self):
@@ -51,23 +52,21 @@ class Graph:
         if node.graph != self:
             node.setGraph(self)
 
-    def createSceneFile(self, classname, match):
-        if not classname in dir(scenefiles):
-            logging.error("Scene File class doesn't exist: {nm}".format(classname))
-            return
+    def createNode(self, classname, match):
+        module = None
+        if classname in dir(scenefiles):
+            module = scenefiles
+        elif classname in dir(actions):
+            module = actions
+        elif classname in dir(data):
+            module = data
 
-        cls = getattr(scenefiles, classname)
+        if not module:
+            logging.error("Unable to find Node class: {nm}".format(nm=classname))
+
+        cls = getattr(module, classname)
         node = cls(match)
         self.addNode(node)
         return node
 
-    def createAction(self, classname, scenefile):
-        if not classname in dir(actions):
-            logging.error("Action class doesn't exist: {nm}".format(classname))
-            return
-
-        cls = getattr(actions, classname)
-        node = cls(scenefile)
-        self.addNode(node)
-        return node
 

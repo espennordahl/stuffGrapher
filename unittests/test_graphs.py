@@ -10,9 +10,9 @@ class TestCreate(unittest.TestCase):
 
     def test_create_graph(self):
         graph = Graph()
-        scenefile = graph.createSceneFile("MayaFile", "lighting")
-        action = graph.createAction("RenderAction", scenefile)
-        data = action.createRenderLayer("dragon")
+        scenefile = graph.createNode("MayaFile", "lighting")
+        action = graph.createNode("RenderAction", "dragon")
+        data = graph.createNode("Data", "dragon")
 
         self.assertEqual(len(graph.nodes), 3)
 
@@ -29,10 +29,12 @@ class TestCreate(unittest.TestCase):
         for x in range(0,numNodes):
             r = random()
             if nodes["scenes"] and r > 0.5:
-                node = graph.createAction(choice(actions), choice(nodes["scenes"]))
+                scene = choice(nodes["scenes"])
+                actiontype = choice(scene.knownActions())
+                node = scene.createAction(actiontype, "bar")
                 nodes["actions"].append(node)
             else:
-                node = graph.createSceneFile(choice(scenefiles), "foo")
+                node = graph.createNode(choice(scenefiles), "foo")
                 nodes["scenes"].append(node)
 
         self.assertEqual(len(nodes["actions"]) + len(nodes["scenes"]), numNodes)
@@ -42,8 +44,8 @@ class TestCreate(unittest.TestCase):
 
     def test_node_names(self):
         graph = Graph()
-        scenefile = graph.createSceneFile("MayaFile", "lighting")
-        action = graph.createAction("RenderAction", scenefile)
+        scenefile = graph.createNode("MayaFile", "lighting")
+        action = scenefile.createAction("RenderAction", "dragon")
         data = action.createRenderLayer("dragon")
 
         self.assertEqual(scenefile.name, "MayaFile")

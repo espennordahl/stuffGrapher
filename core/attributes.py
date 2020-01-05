@@ -47,20 +47,40 @@ class ColorAttribute(Attribute):
     def __init__(self, name, value=None):
         super(ColorAttribute, self).__init__(name, value)
 
+
 class StringAttribute(Attribute):
     def __init__(self, name, value=None):
         super(StringAttribute, self).__init__(name, value)
 
     @classmethod
     def deserialize(self, root):
-        obj = BoolAttribute(root["key"], str(root["value"]))
+        obj = StringAttribute(root["key"], str(root["value"]))
         return obj
 
 class InputAttribute(Attribute):
     def __init__(self, name, value=None):
         super(InputAttribute, self).__init__(name, value)
 
+    @classmethod
+    def deserialize(self, root):
+        value = root["value"]
+        if value == "None":
+            obj = InputAttribute(root["key"], None)
+        else:
+            obj = InputAttribute(root["key"], str(value))
+        return obj
+
+
 class OutputAttribute(Attribute):
     def __init__(self, name, value=None):
         super(OutputAttribute, self).__init__(name, value)
+
+    @classmethod
+    def deserialize(self, root):
+        value = root["value"]
+        if value == "None":
+            obj = OutputAttribute(root["key"], None)
+        else:
+            obj = OutputAttribute(root["key"], str(value))
+        return obj
 

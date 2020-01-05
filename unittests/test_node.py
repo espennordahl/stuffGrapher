@@ -3,7 +3,7 @@ import unittest
 from core import Node
 from core.attributes import *
 
-class TestCreate(unittest.TestCase):
+class Tests(unittest.TestCase):
     def test_demo(self):
         tmp = "foo"
 

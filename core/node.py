@@ -39,9 +39,11 @@ class Node:
 
 
     @classmethod
-    def deserialize(cls, jsonInput):
-        obj = Node(jsonInput["match"])
-        attributes = jsonInput["attributes"]
+    def deserialize(cls, root):
+        if root["class"] != "Node":
+            logging.error("Wrong deserializer called: " + root["class"])
+        obj = Node(root["match"])
+        attributes = root["attributes"]
         for attribute in attributes:
             obj.addAttribute(Attribute.deserialize(attributes[attribute]))
         return obj
@@ -61,3 +63,6 @@ class Node:
         if self.match != other.match:
             return False
         return True
+
+    def __getitem__(self, key):
+        return self.attributes[key]

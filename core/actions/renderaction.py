@@ -3,13 +3,9 @@ from core import Data
 from core.attributes import *
 
 class RenderAction(Action):
-    def __init__(self, scenefile):
-        super(RenderAction, self).__init__(scenefile.match)
-            ## TODO: Should we do this in superclass..?
-        if scenefile.graph:
-            self.setGraph(scenefile.graph)
+    def __init__(self, match):
+        super(RenderAction, self).__init__(match)
 
-        self.addAttribute(InputAttribute("scenefile", scenefile))
         self.addAttribute(BoolAttribute("updateResources", True))
 
 

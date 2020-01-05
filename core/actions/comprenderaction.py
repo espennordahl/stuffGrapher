@@ -2,10 +2,8 @@ from core import Action
 from core import Data
 
 class ComprenderAction(Action):
-    def __init__(self, scenefile):
-        super(ComprenderAction, self).__init__(scenefile.match)
-        if scenefile.graph:
-            self.setGraph(scenefile.graph)
+    def __init__(self, match):
+        super(ComprenderAction, self).__init__(match)
 
     def createWriteNode(self, name):
         match = self.match + "." + name
