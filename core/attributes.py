@@ -1,12 +1,23 @@
 import logging
 
 class Attribute:
-    def __init__(self, name, value=None):
-        if isinstance(name, str):
-            self.name = str(name)
+    def __init__(self, key, value=None):
+        if isinstance(key, str):
+            self.key = str(key)
         else:
-            logging.error("Attribute names must be strings. Received: " + type(name))
+            logging.error("Attribute names must be strings. Received: " + type(key))
         self.value = value
+
+    @classmethod
+    def deserialize(self):
+        
+
+    def serialize(self):
+        root = {}
+        root["class"] = self.__class__.__name__
+        root["key"] = self.key
+        root["value"] = str(self.value)
+        return root
 
     def __eq__(self, other):
         return self.name == other.name and self.value == other.value

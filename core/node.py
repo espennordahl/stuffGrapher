@@ -39,19 +39,20 @@ class Node:
 
 
     @classmethod
-    class deserialize(cls, jsonInput):
+    def deserialize(cls, jsonInput):
         obj = Node(jsonInput["match"])
         for attribute in jsonInput["attributes"]:
             obj.addAttribute(Attribute.deserialize(jsonInput[key]))
         return obj
 
-    def json(self):
+    def serialize(self):
         root = {}
-        root["class"] = "Node"
+        root["class"] = self.__class__.__name__
         root["attributes"] = {}
         root["match"] = self.match
         for attributes in self.attributes:
-            root["attributes"][self.attribute.name] = self.attribute.json()
+            root["attributes"][self.attribute.name] = self.attribute.serialize()
+        return root
 
     def __eq__(self, other):
         if self.attributes != other.attributes:
