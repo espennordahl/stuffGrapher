@@ -1,3 +1,5 @@
+import sys
+
 import logging
 
 class Attribute:
@@ -9,8 +11,18 @@ class Attribute:
         self.value = value
 
     @classmethod
-    def deserialize(self):
+    def deserialize(self, root):
+        classname = root["class"]
+        if not classname in dir(sys.modules[__name__]):
+            logging.error("Asked to deserialize unknown class: " + classname)
         
+        if classname == self.__class__.__name__:
+            logging.error("Asked to serialize Attribute, which is an abstract class")
+
+        cls = getattr(sys.modules[__name__], classname)
+        obj = cls.deserialize(root)
+        return obj
+            
 
     def serialize(self):
         root = {}
@@ -20,11 +32,16 @@ class Attribute:
         return root
 
     def __eq__(self, other):
-        return self.name == other.name and self.value == other.value
+        return self.key == other.key and self.value == other.value
 
 class BoolAttribute(Attribute):
     def __init__(self, name, value=None):
         super(BoolAttribute, self).__init__(name, value)
+
+    @classmethod
+    def deserialize(self, root):
+        obj = BoolAttribute(root["key"], bool(root["value"]))
+        return obj
 
 class ColorAttribute(Attribute):
     def __init__(self, name, value=None):
@@ -33,6 +50,11 @@ class ColorAttribute(Attribute):
 class StringAttribute(Attribute):
     def __init__(self, name, value=None):
         super(StringAttribute, self).__init__(name, value)
+
+    @classmethod
+    def deserialize(self, root):
+        obj = BoolAttribute(root["key"], str(root["value"]))
+        return obj
 
 class InputAttribute(Attribute):
     def __init__(self, name, value=None):

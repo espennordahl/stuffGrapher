@@ -26,11 +26,11 @@ class Node:
 
     def addAttribute(self, attribute):
         if not isinstance(attribute, Attribute):
-            logging.error("addAttribute takes only Attribute objects. Got " + type(attribute))
-        if attribute.name in self.attributes:
-            logging.warning("Attribute with name {nm} already exists. Ignoring.".format(nm=attribute.name))
+            logging.error("addAttribute takes only Attribute objects. Got " + str(type(attribute)))
+        if attribute.key in self.attributes:
+            logging.warning("Attribute with name {nm} already exists. Ignoring.".format(nm=attribute.key))
             return
-        self.attributes[attribute.name] = attribute
+        self.attributes[attribute.key] = attribute
 
     def setGraph(self, graph):
         self.graph = graph
@@ -41,8 +41,9 @@ class Node:
     @classmethod
     def deserialize(cls, jsonInput):
         obj = Node(jsonInput["match"])
-        for attribute in jsonInput["attributes"]:
-            obj.addAttribute(Attribute.deserialize(jsonInput[key]))
+        attributes = jsonInput["attributes"]
+        for attribute in attributes:
+            obj.addAttribute(Attribute.deserialize(attributes[attribute]))
         return obj
 
     def serialize(self):
@@ -50,8 +51,8 @@ class Node:
         root["class"] = self.__class__.__name__
         root["attributes"] = {}
         root["match"] = self.match
-        for attributes in self.attributes:
-            root["attributes"][self.attribute.name] = self.attribute.serialize()
+        for key, value in self.attributes.items():
+            root["attributes"][key] = value.serialize()
         return root
 
     def __eq__(self, other):

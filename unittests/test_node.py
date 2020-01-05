@@ -19,6 +19,8 @@ class TestCreate(unittest.TestCase):
 
     def test_serialize(self):
         obj1 = Node("foo")
-        json1 = node.json()
+        obj1.addAttribute(BoolAttribute("testAttr", True))
+        obj1.addAttribute(StringAttribute("foo", "bar"))
+        json1 = obj1.serialize()
         obj2 = Node.deserialize(json1)
         self.assertEqual(obj1, obj2)
