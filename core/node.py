@@ -64,6 +64,8 @@ class Node:
         return root
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
         if self.attributes != other.attributes:
             return False
         if self.match != other.match:

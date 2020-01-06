@@ -42,6 +42,10 @@ class TestCreate(unittest.TestCase):
         for nodename in graph.nodes:
             self.assertEqual(nodename, graph.nodes[nodename].name)
 
+        json = graph.serialize()
+        revivedGraph = Graph.deserialize(json)
+        self.assertEqual(graph, revivedGraph)
+
     def test_node_names(self):
         graph = Graph()
         scenefile = graph.createNode("MayaFile", "lighting")
@@ -52,10 +56,8 @@ class TestCreate(unittest.TestCase):
         self.assertEqual(action.name, "RenderAction")
         self.assertEqual(data.name, "RenderLayer")
 
-class TestSerialize(unittest.TestCase):
-    def test_simple(self):
-        graph = Graph()
-
+    def foo(self):
+        self.assertEqual(1, 2)
 
 if __name__ == '__main__':
     unittest.main()

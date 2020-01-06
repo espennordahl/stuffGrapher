@@ -32,7 +32,9 @@ class Attribute:
         return root
 
     def __eq__(self, other):
-        return self.key == other.key and self.value == other.value
+    	if not isinstance(other, self.__class__):
+    		return False
+    	return self.key == other.key and self.value == other.value
 
 class BoolAttribute(Attribute):
     def __init__(self, name, value=None):
@@ -64,23 +66,20 @@ class InputAttribute(Attribute):
     @classmethod
     def deserialize(self, root):
         value = root["value"]
-        if value == "None":
+        if value == None:
             obj = InputAttribute(root["key"], None)
         else:
             obj = InputAttribute(root["key"], str(value))
         return obj
 
-
-class OutputAttribute(Attribute):
-    def __init__(self, name, value=None):
-        super(OutputAttribute, self).__init__(name, value)
-
-    @classmethod
-    def deserialize(self, root):
-        value = root["value"]
-        if value == "None":
-            obj = OutputAttribute(root["key"], None)
+    def serialize(self):
+        root = {}
+        root["class"] = self.__class__.__name__
+        root["key"] = self.key
+        if self.value:
+            root["value"] = str(self.value.name)
         else:
-            obj = OutputAttribute(root["key"], str(value))
-        return obj
+            root["value"] = None
+        return root
+
 

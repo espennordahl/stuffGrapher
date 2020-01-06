@@ -26,3 +26,27 @@ class SceneFile(Node):
             self.graph.addNode(action)
 
         return action
+
+    @classmethod
+    def deserialize(cls, root):
+        import core.scenefiles
+        classname = root["class"]
+        if not classname in dir(core.scenefiles):
+            logging.error("Unable to deserialize. Unknown classname: " + classname)
+
+        cls = getattr(core.scenefiles, classname)
+
+        match = root["match"]
+
+        obj = cls(root["match"])
+
+        attributes = root["attributes"]
+        for attrname in attributes:
+            attribute = Attribute.deserialize(attributes[attrname])
+            if attrname in obj.attributes:
+                obj[attrname] = attribute
+            else:
+                obj.addAttribute(attribute)
+
+        return obj
+

@@ -4,6 +4,8 @@ import sys
 from core import actions
 from core import scenefiles
 from core import data
+from core import Node
+from core.attributes import *
 
 class Graph:
     def __init__(self):
@@ -49,7 +51,7 @@ class Graph:
         name = self.createUniqueName(node.name)
         node._name = name
         self.nodes[node.name] = node
-        if node.graph != self:
+        if node.graph is not self:
             node.setGraph(self)
 
     def createNode(self, classname, match):
@@ -69,4 +71,49 @@ class Graph:
         self.addNode(node)
         return node
 
+    def serialize(self):
+        root = {}
+        root["class"] = "Graph"
+        root["nodes"] = []
+        for node in self.nodes.values():
+            root["nodes"].append(node.serialize())
+        return root
+
+    @classmethod
+    def deserialize(cls, root):
+        classname = root["class"]
+        if classname != "Graph":
+            logging.error("Wrong serializer called. Expected Graph, got " + classname)
+
+        graph = Graph()
+        for node in root["nodes"]:
+            classname = node["class"]
+            module = None
+            if classname in dir(scenefiles):
+                module = scenefiles
+            elif classname in dir(actions):
+                module = actions
+            elif classname in dir(data):
+                module = data
+            if not module:
+                logging.error("Unable to find Node class: {nm}".format(nm=classname))
+
+            cls = getattr(module, classname)
+            obj = cls.deserialize(node)
+            graph.addNode(obj)
+        
+        ## Connection attributes will deserialize to strings.
+        ## So after all nodes are initialized we hook them up
+        ## TODO: There's probably a smarter/cleaner way to do this
+
+        for node in graph.nodes.values():
+            for attribute in node.attributes.values():
+                if isinstance(attribute, InputAttribute):
+                    nodename = attribute.value
+                    attribute.value = graph.nodes[nodename]
+
+        return graph
+
+    def __eq__(self, other):
+        return self.nodes == other.nodes
 
