@@ -8,7 +8,6 @@ class Action(Node):
         super(Action, self).__init__(match)
         self.addAttribute(InputAttribute("scenefile", None))
  
- 
     @classmethod
     def deserialize(cls, root):
         import core.actions
@@ -23,8 +22,12 @@ class Action(Node):
         obj = cls(root["match"])
 
         attributes = root["attributes"]
-        for attribute in attributes:
-            obj.addAttribute(Attribute.deserialize(attributes[attribute]))
+        for attrname in attributes:
+            attribute = Attribute.deserialize(attributes[attrname])
+            if attrname in obj.attributes:
+                obj[attrname] = attribute
+            else:
+                obj.addAttribute(attribute)
 
         return obj
 
