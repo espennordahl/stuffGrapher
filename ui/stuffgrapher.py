@@ -6,6 +6,27 @@ from PyQt5.QtWidgets import *
 
 import qdarkstyle
 
+
+class AttributeEditor(QDockWidget):
+    def __init__(self, parent=None):
+        super(QDockWidget, self).__init__("Attribute Editor")
+        listWidget = QListWidget()
+        listWidget.addItem("Item")
+        listWidget.addItem("Item")
+        listWidget.addItem("Item")
+        listWidget.addItem("Item")
+        self.setWidget(listWidget)
+
+class NodeView(QGraphicsView):
+    def __init__(self, scene, parent=None):
+        super(NodeView, self).__init__(parent)
+        self.setScene(scene)
+        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
+        self.drag = False
+
+
+
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -15,19 +36,28 @@ class MainWindow(QMainWindow):
         self.show()
 
     def _initUI(self):
+        # Status Bar
         self.statusBar().showMessage("Ready")
         
+        # Window Size
         self.setMinimumSize(400, 400)
         self.setGeometry(100, 100, 1500, 900)
 
-        self.attributeEditor = QDockWidget("Attribute Editor", self)
-        listWidget = QListWidget()
-        listWidget.addItem("Item")
-        listWidget.addItem("Item")
-        listWidget.addItem("Item")
-        listWidget.addItem("Item")
-        self.attributeEditor.setWidget(listWidget)
-        self.setCentralWidget(QTextEdit())
+        # Central Widget.
+        self.centralWidget = QFrame()
+        self.setCentralWidget(self.centralWidget)
+
+        # Central Layout.
+        self.centralLayout = QHBoxLayout(self.centralWidget)
+
+        # GraphicsView.
+        self.scene = QGraphicsScene()
+        self.scene.setSceneRect(0,0,32000,32000)
+        self.view = NodeView(self.scene, self)
+        self.centralLayout.addWidget(self.view)
+
+        # Attribute Editor
+        self.attributeEditor = AttributeEditor(self)
         self.addDockWidget(Qt.RightDockWidgetArea, self.attributeEditor)
 
 
