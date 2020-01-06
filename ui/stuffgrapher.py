@@ -1,12 +1,12 @@
 import sys
 
-import PyQt5.QtGui as QtGui
-import PyQt5.QtCore as QtCore
-import PyQt5.QtWidgets as QtWidgets
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 
 import qdarkstyle
 
-class MainWindow(QtWidgets.QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setWindowTitle("StuffGrapher")
@@ -20,6 +20,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMinimumSize(400, 400)
         self.setGeometry(100, 100, 1500, 900)
 
+        self.attributeEditor = QDockWidget("Attribute Editor", self)
+        listWidget = QListWidget()
+        listWidget.addItem("Item")
+        listWidget.addItem("Item")
+        listWidget.addItem("Item")
+        listWidget.addItem("Item")
+        self.attributeEditor.setWidget(listWidget)
+        self.setCentralWidget(QTextEdit())
+        self.addDockWidget(Qt.RightDockWidgetArea, self.attributeEditor)
+
+
     def _initMenuBar(self):
         menuBar = self.menuBar()
 
@@ -27,25 +38,25 @@ class MainWindow(QtWidgets.QMainWindow):
         self.fileMenu = menuBar.addMenu("File")
 
         ## Open
-        openAction = QtWidgets.QAction("Open", self)
+        openAction = QAction("Open", self)
         openAction.setShortcut("Ctrl+O")
         openAction.setStatusTip("Open File")
         self.fileMenu.addAction(openAction)
 
         ## Save
-        saveAction = QtWidgets.QAction("Save", self)
+        saveAction = QAction("Save", self)
         saveAction.setShortcut("Ctrl+s")
         saveAction.setStatusTip("Save File")
         self.fileMenu.addAction(saveAction)
 
         ## Save As
-        saveAsAction = QtWidgets.QAction("Save As", self)
+        saveAsAction = QAction("Save As", self)
         saveAsAction.setShortcut("Ctrl+S")
         saveAsAction.setStatusTip("Save File As")
         self.fileMenu.addAction(saveAsAction)
 
         ## Exit
-        exitAction = QtWidgets.QAction(" Exit", self)
+        exitAction = QAction(" Exit", self)
         exitAction.setShortcut("Ctrl+Q")
         exitAction.setStatusTip("Exit application")
         exitAction.triggered.connect(self.close)
@@ -55,31 +66,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.editMenu = menuBar.addMenu("Edit")
 
         ## Undo
-        undoAction = QtWidgets.QAction("Undo", self)
+        undoAction = QAction("Undo", self)
         undoAction.setShortcut("Ctrl+z")
         undoAction.setStatusTip("Undo")
         self.editMenu.addAction(undoAction)
 
         ## Redo
-        redoAction = QtWidgets.QAction("Redo", self)
+        redoAction = QAction("Redo", self)
         redoAction.setShortcut("Ctrl+y")
         redoAction.setStatusTip("Redo")
         self.editMenu.addAction(redoAction)
 
         ## Copy
-        copyAction = QtWidgets.QAction("Copy", self)
+        copyAction = QAction("Copy", self)
         copyAction.setShortcut("Ctrl+c")
         copyAction.setStatusTip("Copy selection")
         self.editMenu.addAction(copyAction)
 
         ## Cut
-        cutAction = QtWidgets.QAction("Cut", self)
+        cutAction = QAction("Cut", self)
         cutAction.setShortcut("Ctrl+x")
         cutAction.setStatusTip("Cut selection")
         self.editMenu.addAction(cutAction)
 
         ## Paste
-        pasteAction = QtWidgets.QAction("Paste", self)
+        pasteAction = QAction("Paste", self)
         pasteAction.setShortcut("Ctrl+v")
         pasteAction.setStatusTip("Paste")
         self.editMenu.addAction(pasteAction)
@@ -87,7 +98,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     mainWindow = MainWindow()
 
     # setup stylesheet
