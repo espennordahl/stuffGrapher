@@ -6,25 +6,8 @@ from PyQt5.QtWidgets import *
 
 import qdarkstyle
 
-
-class AttributeEditor(QDockWidget):
-    def __init__(self, parent=None):
-        super(QDockWidget, self).__init__("Attribute Editor")
-        listWidget = QListWidget()
-        listWidget.addItem("Item")
-        listWidget.addItem("Item")
-        listWidget.addItem("Item")
-        listWidget.addItem("Item")
-        self.setWidget(listWidget)
-
-class NodeView(QGraphicsView):
-    def __init__(self, scene, parent=None):
-        super(NodeView, self).__init__(parent)
-        self.setScene(scene)
-        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
-        self.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
-        self.drag = False
-
+from .attributeeditor import AttributeEditor
+from .nodegraph import *
 
 
 class MainWindow(QMainWindow):
@@ -53,8 +36,8 @@ class MainWindow(QMainWindow):
         # GraphicsView.
         self.scene = QGraphicsScene()
         self.scene.setSceneRect(0,0,32000,32000)
-        self.view = NodeView(self.scene, self)
-        self.centralLayout.addWidget(self.view)
+        self.nodeGraph = NodeGraphView(self.scene, self)
+        self.centralLayout.addWidget(self.nodeGraph)
 
         # Attribute Editor
         self.attributeEditor = AttributeEditor(self)
@@ -66,6 +49,12 @@ class MainWindow(QMainWindow):
 
         ## File menu
         self.fileMenu = menuBar.addMenu("File")
+
+        ## Create Node (Temp) 
+        createAction = QAction("Create Node", self)
+        createAction.setStatusTip("Create Node")
+        createAction.triggered.connect(self.createNode)
+        self.fileMenu.addAction(createAction)
 
         ## Open
         openAction = QAction("Open", self)
@@ -125,15 +114,5 @@ class MainWindow(QMainWindow):
         pasteAction.setStatusTip("Paste")
         self.editMenu.addAction(pasteAction)
 
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    mainWindow = MainWindow()
-
-    # setup stylesheet
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-
-    mainWindow.show()
-
-    sys.exit(app.exec_())
+    def createNode(self):
+        self.nodeGraph.addNode(NodeItem())
