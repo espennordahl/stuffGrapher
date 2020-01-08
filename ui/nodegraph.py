@@ -15,7 +15,7 @@ class NodeLine(QGraphicsPathItem):
         self.pen = QPen()
         self.pen.setStyle(Qt.SolidLine)
         self.pen.setWidth(2)
-        self.pen.setColor(QColor(255,20,20,255))
+        self.pen.setColor(QColor(230,230,230,255))
         self.setPen(self.pen)
 
     def mousePressEvent(self, event):
@@ -82,7 +82,7 @@ class NodeSocket(QGraphicsItem):
         # Brush.
         self.brush = QBrush()
         self.brush.setStyle(Qt.SolidPattern)
-        self.brush.setColor(QColor(180,20,90,255))
+        self.brush.setColor(QColor(60,60,60,255))
 
         # Pen.
         self.pen = QPen()
@@ -172,7 +172,7 @@ class NodeItem(QGraphicsItem):
         # Brush.
         self.brush = QBrush()
         self.brush.setStyle(Qt.SolidPattern)
-        self.brush.setColor(QColor(80,0,90,255))
+        self.brush.setColor(QColor(100,100,100,255))
 
         # Pen.
         self.pen = QPen()
@@ -183,7 +183,7 @@ class NodeItem(QGraphicsItem):
         self.selPen = QPen()
         self.selPen.setStyle(Qt.SolidLine)
         self.selPen.setWidth(1)
-        self.selPen.setColor(QColor(0,255,255,255))
+        self.selPen.setColor(QColor(255,255,255,255))
 
     def initUi(self):
         self.Input = NodeSocket(QRect(-10,20,20,20), self, 'in')

@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import *
 import qdarkstyle
 
 from .attributeeditor import AttributeEditor
+from .shotbrowser import ShotBrowser
 from .nodegraph import *
 
 
@@ -26,14 +27,12 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(400, 400)
         self.setGeometry(100, 100, 1500, 900)
 
-        # Central Widget.
+        # NodeGraph
         self.centralWidget = QFrame()
         self.setCentralWidget(self.centralWidget)
 
-        # Central Layout.
         self.centralLayout = QHBoxLayout(self.centralWidget)
 
-        # GraphicsView.
         self.scene = QGraphicsScene()
         self.scene.setSceneRect(0,0,32000,32000)
         self.nodeGraph = NodeGraphView(self.scene, self)
@@ -42,6 +41,10 @@ class MainWindow(QMainWindow):
         # Attribute Editor
         self.attributeEditor = AttributeEditor(self)
         self.addDockWidget(Qt.RightDockWidgetArea, self.attributeEditor)
+
+        # Shot Browser
+        self.shotBrowser = ShotBrowser(self)
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.shotBrowser)
 
 
     def _initMenuBar(self):
