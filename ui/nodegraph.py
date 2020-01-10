@@ -111,6 +111,27 @@ class NodeSocket(QGraphicsItem):
         painter.setPen(self.pen)
         painter.drawEllipse(self.rect)
 
+    def addConnection(self, item):
+        if self.type == 'in':
+            logging.debug("adding input connection between {i} and {o}".format(
+                                i=self.parentItem().node.name,
+                                o=item.node.name))
+            
+            rect = self.boundingRect()
+            pointB = QPointF(rect.x() + rect.width()/2, rect.y() + rect.height()/2)
+            pointB = self.mapToScene(pointB)
+            pointA = self.mapToScene(item.output.getCenter())
+            
+            line = NodeLine(pointA, pointB)
+            line.source = item.output
+            line.target = self
+
+            self.inLines.append(line)
+            item.output.outLines.append(line)
+            self.scene().addItem(line)
+
+            line.updatePath()
+
     def mousePressEvent(self, event):
         if self.type == 'out':
             rect = self.boundingRect()
@@ -146,12 +167,14 @@ class NodeSocket(QGraphicsItem):
         if self.type == 'out' and item.type == 'in':
             self.newLine.source = self
             self.newLine.target = item
-            item.parentItem().Input.inLines.append(self.newLine)
+            item.parentItem().addInput(self.parentItem())
+            item.parentItem().input.inLines.append(self.newLine)
             self.newLine.pointB = item.getCenter()
         elif self.type == 'in' and item.type == 'out':
             self.newLine.source = item
             self.newLine.target = self
-            item.parentItem().Output.outLines.append(self.newLine)
+            self.parentItem().addInput(item.parentItem())
+            item.parentItem().output.outLines.append(self.newLine)
             self.newLine.pointA = item.getCenter()
         else:
             super(NodeSocket, self).mouseReleaseEvent(event)
@@ -173,7 +196,10 @@ class NodeItem(QGraphicsItem):
                 self.node.addAttribute(FloatAttribute("pos.x", self.pos().x))
             if not self.node.hasAttribute("pos.y"):
                 self.node.addAttribute(FloatAttribute("pos.y", self.pos().y))
- 
+
+        self.input = None
+        self.output = None
+
         self.rect = QRect(0,0,100,60)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
@@ -197,8 +223,10 @@ class NodeItem(QGraphicsItem):
         self.selPen.setColor(QColor(255,255,255,255))
 
     def initUi(self):
-        self.Input = NodeSocket(QRect(-10,20,20,20), self, 'in')
-        self.Output = NodeSocket(QRect(90,20,20,20), self, 'out')
+        for attribute in self.node.attributes.values():
+            if isinstance(attribute, InputAttribute):
+                self.input = NodeSocket(QRect(-10,20,20,20), self, 'in')
+        self.output = NodeSocket(QRect(90,20,20,20), self, 'out')
 
     def shape(self):
         path = QPainterPath()
@@ -218,12 +246,14 @@ class NodeItem(QGraphicsItem):
 
     def mouseMoveEvent(self, event):
         super(NodeItem, self).mouseMoveEvent(event)
-        for line in self.Output.outLines:
-            line.pointA = line.source.getCenter()
-            line.pointB = line.target.getCenter()
-        for line in self.Input.inLines:
-            line.pointA = line.source.getCenter()
-            line.pointB = line.target.getCenter()
+        if self.output:
+            for line in self.output.outLines:
+                line.pointA = line.source.getCenter()
+                line.pointB = line.target.getCenter()
+        if self.input:
+            for line in self.input.inLines:
+                line.pointA = line.source.getCenter()
+                line.pointB = line.target.getCenter()
 
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -238,6 +268,25 @@ class NodeItem(QGraphicsItem):
                 self.node["pos.x"].value = self.pos().x
                 self.node["pos.y"].value = self.pos().y
         return QGraphicsItem.itemChange(self, change, value)
+
+    def createConnections(self):
+        for attribute in self.node.attributes.values():
+            if isinstance(attribute, InputAttribute):
+                logging.debug("Creating intput connection")
+                items = self.scene().items()
+                item = None
+                for x in items:
+                    if isinstance(x, NodeItem):
+                        if x.node == attribute.value:
+                            item = x
+                if not item:
+                    logging.error("Couldn't find item by name: " + str(attribute.value.name))
+                self.input.addConnection(item)
+
+    def addInput(self, item):
+        for attribute in self.node.attributes.values():
+            if isinstance(attribute, InputAttribute):
+                attribute.value = item.node
 
 class NodeGraphView(QGraphicsView):
     def __init__(self, parent=None):
@@ -281,11 +330,17 @@ class NodeGraphView(QGraphicsView):
         else:
             graph = self.shot.graph
             logging.debug("Graph has {num} nodes. Populating.".format(num=len(graph.nodes)))
+            items = []
+            ## Nodes first
             for node in graph.nodes.values():
                 item = NodeItem(node)
+                items.append(item)
                 if node.hasAttribute("pos.x"):
                     x = node["pos.x"].value()
                     y = node["pos.y"].value()
                     item.setPos(x, y)
                 self.addNodeItem(item)
 
+            ## Then connections
+            for item in items:
+                item.createConnections()
