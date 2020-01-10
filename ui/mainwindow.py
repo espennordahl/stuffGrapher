@@ -13,7 +13,6 @@ from .nodegraph import *
 from core import Shot
 from core import Graph
 
-
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -134,16 +133,43 @@ class MainWindow(QMainWindow):
 
         ## Node Menu
         self.nodeMenu = menuBar.addMenu("Nodes")
-
-        ## Create Node (Temp) 
-        createAction = QAction("Create Node", self)
-        createAction.setStatusTip("Create Node")
-        createAction.triggered.connect(self.createNode)
-        self.nodeMenu.addAction(createAction)
+        self.buildCreateNodeMenu(self.nodeMenu)
 
 
-    def createNode(self):
-        self.nodeGraph.addNode(NodeItem())
+    def buildCreateNodeMenu(self, menu):
+        
+        ## Actions
+        actionsMenu = menu.addMenu("Actions")
+        actions = [
+                    "Render",
+                    "Comprender",
+                    "PublishGeo",
+                    "PublishLookdev",
+                    "PublishGeocache"
+                    ]
+        for actionname in actions:
+                action = QAction(actionname, self)
+                action.setStatusTip("Create {node}".format(node=actionname))
+                action.triggered.connect(
+                                lambda checked, name=actionname + "Action": self.createNode(name))
+                actionsMenu.addAction(action)
+
+        sceneMenu = menu.addMenu("Scenes")
+        scenes  = [
+                        "Maya",
+                        "Houdini",
+                        "Nuke"
+                    ]
+        for scenename in scenes:
+                action = QAction(scenename, self)
+                action.setStatusTip("Create {node}".format(node=scenename))
+                action.triggered.connect(
+                                lambda checked, name=scenename + "File": self.createNode(name))
+                sceneMenu.addAction(action)
+
+
+    def createNode(self, classname):
+        self.nodeGraph.createNode(classname)
 
     def importShots(self):
         tempshots = [
@@ -168,3 +194,5 @@ class MainWindow(QMainWindow):
     def shotChanged(self, shotname):
         self.graphLabel.setText(shotname)
         self.nodeGraph.setShot(self.shots[shotname])
+
+

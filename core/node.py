@@ -32,6 +32,9 @@ class Node:
             return
         self.attributes[attribute.key] = attribute
 
+    def hasAttribute(self, attributename):
+        return attributename in self.attributes
+
     def setGraph(self, graph):
         self.graph = graph
         if self not in graph.nodes.values():

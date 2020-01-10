@@ -1,8 +1,11 @@
+import logging
+
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from core import Graph
+from core.attributes import *
 
 class NodeLine(QGraphicsPathItem):
     def __init__(self, pointA, pointB):
@@ -162,12 +165,19 @@ class NodeSocket(QGraphicsItem):
 
 
 class NodeItem(QGraphicsItem):
-    def __init__(self):
+    def __init__(self, node=None):
         super(NodeItem, self).__init__()
-        self.name = None
+        self.node = node
+        if self.node:
+            if not self.node.hasAttribute("pos.x"):
+                self.node.addAttribute(FloatAttribute("pos.x", self.pos().x))
+            if not self.node.hasAttribute("pos.y"):
+                self.node.addAttribute(FloatAttribute("pos.y", self.pos().y))
+ 
         self.rect = QRect(0,0,100,60)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
+        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
         self.initUi()
 
         # Brush.
@@ -222,12 +232,18 @@ class NodeItem(QGraphicsItem):
         debugConnections = menu.addAction('debug connections')
         selectedAction = menu.exec_(event.screenPos())
 
-
+    def itemChange(self, change, value):
+        if change == QGraphicsItem.ItemPositionHasChanged:
+            if self.node:
+                self.node["pos.x"].value = self.pos().x
+                self.node["pos.y"].value = self.pos().y
+        return QGraphicsItem.itemChange(self, change, value)
 
 class NodeGraphView(QGraphicsView):
     def __init__(self, parent=None):
         super(NodeGraphView, self).__init__(parent)
         self.nodes = []
+        self.shot = None
 
         scene = QGraphicsScene()
         scene.setSceneRect(0,0,32000,32000) 
@@ -237,27 +253,41 @@ class NodeGraphView(QGraphicsView):
         self.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
         self.drag = False
 
-    def addNode(self, node):
+    def createNode(self, classname):
+        if not self.shot:
+            logging.warning("No shot selected. Unable to create node")
+            return
+        
+        node = self.shot.graph.createNode(classname, "foo") 
+
+        item = NodeItem(node)
+        item.setPos(self.scene().width()/2, self.scene().height()/2)
+
+        self.addNodeItem(item)
+
+    def addNodeItem(self, node):
         scene = self.scene()
         scene.addItem(node)
         self.nodes.append(node)
-        node.setPos(scene.width()/2, scene.height()/2)
 
     def setShot(self, shot):
+        logging.debug("Setting shot: " + shot.name)
         self.shot = shot
         self.clearGraph()
 
         if not self.shot.graph:
+            logging.debug("No graph for shot yet. Creating one")
             self.shot.graph = Graph()
         else:
             graph = self.shot.graph
-            for node in graph.nodes:
-                item = NodeItem()
+            logging.debug("Graph has {num} nodes. Populating.".format(num=len(graph.nodes)))
+            for node in graph.nodes.values():
+                item = NodeItem(node)
                 if node.hasAttribute("pos.x"):
                     x = node["pos.x"].value()
-                    y = node["pox.y"].value()
+                    y = node["pos.y"].value()
                     item.setPos(x, y)
-                self.addNode(item)
+                self.addNodeItem(item)
 
     def clearGraph(self):
         scene = self.scene()

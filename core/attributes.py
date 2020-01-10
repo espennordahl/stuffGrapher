@@ -36,6 +36,8 @@ class Attribute:
     		return False
     	return self.key == other.key and self.value == other.value
 
+
+
 class BoolAttribute(Attribute):
     def __init__(self, name, value=None):
         super(BoolAttribute, self).__init__(name, value)
@@ -49,6 +51,9 @@ class ColorAttribute(Attribute):
     def __init__(self, name, value=None):
         super(ColorAttribute, self).__init__(name, value)
 
+class FloatAttribute(Attribute):
+    def __init__(self, name, value=None):
+        super(FloatAttribute, self).__init__(name, value)
 
 class StringAttribute(Attribute):
     def __init__(self, name, value=None):
