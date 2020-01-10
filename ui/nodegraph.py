@@ -273,7 +273,7 @@ class NodeGraphView(QGraphicsView):
     def setShot(self, shot):
         logging.debug("Setting shot: " + shot.name)
         self.shot = shot
-        self.clearGraph()
+        self.scene().clear()
 
         if not self.shot.graph:
             logging.debug("No graph for shot yet. Creating one")
@@ -289,8 +289,3 @@ class NodeGraphView(QGraphicsView):
                     item.setPos(x, y)
                 self.addNodeItem(item)
 
-    def clearGraph(self):
-        scene = self.scene()
-        for node in self.nodes:
-            scene.removeItem(node)
-        self.nodes = []
