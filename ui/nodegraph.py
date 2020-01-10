@@ -2,6 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+from core import Graph
 
 class NodeLine(QGraphicsPathItem):
     def __init__(self, pointA, pointB):
@@ -224,9 +225,14 @@ class NodeItem(QGraphicsItem):
 
 
 class NodeGraphView(QGraphicsView):
-    def __init__(self, scene, parent=None):
+    def __init__(self, parent=None):
         super(NodeGraphView, self).__init__(parent)
+        self.nodes = []
+
+        scene = QGraphicsScene()
+        scene.setSceneRect(0,0,32000,32000) 
         self.setScene(scene)
+
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
         self.drag = False
@@ -234,4 +240,27 @@ class NodeGraphView(QGraphicsView):
     def addNode(self, node):
         scene = self.scene()
         scene.addItem(node)
+        self.nodes.append(node)
         node.setPos(scene.width()/2, scene.height()/2)
+
+    def setShot(self, shot):
+        self.shot = shot
+        self.clearGraph()
+
+        if not self.shot.graph:
+            self.shot.graph = Graph()
+        else:
+            graph = self.shot.graph
+            for node in graph.nodes:
+                item = NodeItem()
+                if node.hasAttribute("pos.x"):
+                    x = node["pos.x"].value()
+                    y = node["pox.y"].value()
+                    item.setPos(x, y)
+                self.addNode(item)
+
+    def clearGraph(self):
+        scene = self.scene()
+        for node in self.nodes:
+            scene.removeItem(node)
+        self.nodes = []

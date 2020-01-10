@@ -10,13 +10,20 @@ from .attributeeditor import AttributeEditor
 from .shotbrowser import ShotBrowser
 from .nodegraph import *
 
+from core import Shot
+from core import Graph
+
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        
+        self.shots = {}
+
         self.setWindowTitle("StuffGrapher")
         self._initUI()
         self._initMenuBar()
+
         self.show()
 
     def _initUI(self):
@@ -31,11 +38,12 @@ class MainWindow(QMainWindow):
         self.centralWidget = QFrame()
         self.setCentralWidget(self.centralWidget)
 
-        self.centralLayout = QHBoxLayout(self.centralWidget)
+        self.centralLayout = QVBoxLayout(self.centralWidget)
 
-        self.scene = QGraphicsScene()
-        self.scene.setSceneRect(0,0,32000,32000)
-        self.nodeGraph = NodeGraphView(self.scene, self)
+        self.graphLabel = QLabel("No shot selected")
+        self.centralLayout.addWidget(self.graphLabel, alignment=Qt.AlignCenter)
+
+        self.nodeGraph = NodeGraphView(self)
         self.centralLayout.addWidget(self.nodeGraph)
 
         # Attribute Editor
@@ -44,6 +52,8 @@ class MainWindow(QMainWindow):
 
         # Shot Browser
         self.shotBrowser = ShotBrowser(self)
+        self.shotBrowser.shotChanged.connect(self.shotChanged)
+
         self.addDockWidget(Qt.LeftDockWidgetArea, self.shotBrowser)
 
 
@@ -52,12 +62,6 @@ class MainWindow(QMainWindow):
 
         ## File menu
         self.fileMenu = menuBar.addMenu("File")
-
-        ## Create Node (Temp) 
-        createAction = QAction("Create Node", self)
-        createAction.setStatusTip("Create Node")
-        createAction.triggered.connect(self.createNode)
-        self.fileMenu.addAction(createAction)
 
         ## Open
         openAction = QAction("Open", self)
@@ -117,5 +121,50 @@ class MainWindow(QMainWindow):
         pasteAction.setStatusTip("Paste")
         self.editMenu.addAction(pasteAction)
 
+        ## Shots menu
+        self.shotMenu = menuBar.addMenu("Shots")
+
+        ## Import shots 
+        importSGAction = QAction("Import shots from Shotgun", self)
+        importSGAction.setStatusTip("Import shots from Shotgun")
+        importSGAction.triggered.connect(self.importShots)
+        self.shotMenu.addAction(importSGAction)
+
+
+
+        ## Node Menu
+        self.nodeMenu = menuBar.addMenu("Nodes")
+
+        ## Create Node (Temp) 
+        createAction = QAction("Create Node", self)
+        createAction.setStatusTip("Create Node")
+        createAction.triggered.connect(self.createNode)
+        self.nodeMenu.addAction(createAction)
+
+
     def createNode(self):
         self.nodeGraph.addNode(NodeItem())
+
+    def importShots(self):
+        tempshots = [
+                        "fx010",
+                        "fx020",
+                        "fx030",
+                        "fx040",
+                        "fx100",
+                        "fx120",
+                        "vg040",
+                        "vg045",
+                        "vg080"
+                        ]
+        for shotname in tempshots:
+            if shotname in self.shots:
+                continue
+            shot = Shot(shotname)
+            shot.graph = Graph()
+            self.shots[shotname] = shot
+            self.shotBrowser.addShot(shotname)
+
+    def shotChanged(self, shotname):
+        self.graphLabel.setText(shotname)
+        self.nodeGraph.setShot(self.shots[shotname])
