@@ -202,7 +202,7 @@ class NodeItem(QGraphicsItem):
         self.input = None
         self.output = None
 
-        self.rect = QRect(0,0,100,60)
+        self.rect = QRect(0,0,120,50)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
@@ -224,11 +224,25 @@ class NodeItem(QGraphicsItem):
         self.selPen.setWidth(3)
         self.selPen.setColor(QColor(255,255,255,255))
 
+        # Text
+        self.font = QFont()
+        self.font.setPixelSize(20)
+
     def initUi(self):
+        socketSize = 16
         for attribute in self.node.attributes.values():
             if isinstance(attribute, InputAttribute):
-                self.input = NodeSocket(QRect(-10,20,20,20), self, 'in')
-        self.output = NodeSocket(QRect(90,20,20,20), self, 'out')
+                self.input = NodeSocket(QRect(
+                                                -socketSize/2,
+                                                self.rect.height()/2-socketSize/2,
+                                                socketSize,
+                                                socketSize
+                                                ), self, 'in')
+        self.output = NodeSocket(QRect(
+                                        self.rect.width()-socketSize/2,
+                                        self.rect.height()/2-socketSize/2,
+                                        socketSize,
+                                        socketSize), self, 'out')
 
     def shape(self):
         path = QPainterPath()
@@ -237,14 +251,23 @@ class NodeItem(QGraphicsItem):
 
     def boundingRect(self):
         return QRectF(self.rect)
-
+    
     def paint(self, painter, option, widget):
         painter.setBrush(self.brush)
+        
         if self.isSelected():
             painter.setPen(self.selPen)
         else:
             painter.setPen(self.pen)
+        
         painter.drawRoundedRect(self.rect, 5.0, 5.0)
+        
+        font = painter.font()
+        font.setBold(True)
+        font.setPointSize(12)
+        painter.setFont(font)
+        painter.setPen(Qt.black)
+        painter.drawText(self.rect.adjusted(0,0,-5,0), Qt.AlignCenter, self.node.name)
 
     def mouseMoveEvent(self, event):
         super(NodeItem, self).mouseMoveEvent(event)
