@@ -99,6 +99,7 @@ class NodeSocket(QGraphicsItem):
         # Lines.
         self.outLines = []
         self.inLines = []
+        self.newLine = None
 
     def shape(self):
         path = QPainterPath()
@@ -134,12 +135,12 @@ class NodeSocket(QGraphicsItem):
 
             line.updatePath()
 
-    def mousePressEvent(self, event):
+    def createNewLine(self, pos):
         if self.type == 'out':
             rect = self.boundingRect()
             pointA = QPointF(rect.x() + rect.width()/2, rect.y() + rect.height()/2)
             pointA = self.mapToScene(pointA)
-            pointB = self.mapToScene(event.pos())
+            pointB = self.mapToScene(pos)
             self.newLine = NodeLine(pointA, pointB)
             self.outLines.append(self.newLine)
             self.scene().addItem(self.newLine)
@@ -151,35 +152,54 @@ class NodeSocket(QGraphicsItem):
             self.newLine = NodeLine(pointA, pointB)
             self.inLines.append(self.newLine)
             self.scene().addItem(self.newLine)
+ 
+    def updateNewLine(self, pos):
+        point = self.mapToScene(pos)
+        if self.type == 'out':
+            self.newLine.pointB = point
+        elif self.type == 'in':
+            self.newLine.pointA = point
+
+    def connectToItem(self, item):
+        logging.debug("Trying to connect to item")
+        if self.type == 'out' and item.type == 'in':
+            self.newLine.pointB = item.getCenter()
+            self.newLine.source = self
+            self.newLine.target = item
+            item.parentItem().addInput(self.parentItem())
+            item.parentItem().input.inLines.append(self.newLine)
+            self.newLine = None
+        elif self.type == 'in' and item.type == 'out':
+            self.newLine.pointA = item.getCenter()
+            self.newLine.source = item
+            self.newLine.target = self
+            self.parentItem().addInput(item.parentItem())
+            item.parentItem().output.outLines.append(self.newLine)
+            self.newLine = None
+
+    def removeNewLine(self):
+        if self.newLine in self.outLines:
+            self.outLines.remove(self.newLine)
         else:
-            super(NodeSocket, self).mousePressEvent(event)
+            self.inLines.remove(self.newLine)
+        self.scene().removeItem(self.newLine)
+        self.newLine = None
+
+    def mousePressEvent(self, event):
+        self.createNewLine(event.pos())
 
     def mouseMoveEvent(self, event):
-        if self.type == 'out':
-            pointB = self.mapToScene(event.pos())
-            self.newLine.pointB = pointB
-        elif self.type == 'in':
-            pointA = self.mapToScene(event.pos())
-            self.newLine.pointA = pointA
+        if self.newLine:
+            self.updateNewLine(event.pos())
         else:
             super(NodeSocket, self).mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
         item = self.scene().itemAt(event.scenePos().toPoint(), QTransform())
-        if self.type == 'out' and item.type == 'in':
-            self.newLine.source = self
-            self.newLine.target = item
-            item.parentItem().addInput(self.parentItem())
-            item.parentItem().input.inLines.append(self.newLine)
-            self.newLine.pointB = item.getCenter()
-        elif self.type == 'in' and item.type == 'out':
-            self.newLine.source = item
-            self.newLine.target = self
-            self.parentItem().addInput(item.parentItem())
-            item.parentItem().output.outLines.append(self.newLine)
-            self.newLine.pointA = item.getCenter()
-        else:
-            super(NodeSocket, self).mouseReleaseEvent(event)
+        if item:
+            self.connectToItem(item)
+        if self.newLine:
+            self.removeNewLine()
 
     def getCenter(self):
         rect = self.boundingRect()
@@ -202,7 +222,9 @@ class NodeItem(QGraphicsItem):
         self.input = None
         self.output = None
 
-        self.rect = QRect(0,0,120,50)
+        textWidth = len(node.name) * 10
+        nodeWidth = max(100, min(textWidth, 200))
+        self.rect = QRect(0,0,nodeWidth,50)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
@@ -280,13 +302,6 @@ class NodeItem(QGraphicsItem):
                 line.pointA = line.source.getCenter()
                 line.pointB = line.target.getCenter()
 
-    def contextMenuEvent(self, event):
-        menu = QMenu()
-        make = menu.addAction('make')
-        makeFromHere = menu.addAction('make from here')
-        debugConnections = menu.addAction('debug connections')
-        selectedAction = menu.exec_(event.screenPos())
-
     def itemChange(self, change, value):
         if change == QGraphicsItem.ItemPositionHasChanged:
             if self.node:
@@ -333,6 +348,15 @@ class SceneNodeItem(NodeItem):
         self.brush = QBrush(gradient)
         logging.debug("Created SceneNodeItem")
 
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+        make = menu.addAction('Create on disk')
+        listAction = menu.addAction('List versions')
+        actionMenu = menu.addMenu("Create Action")
+        for action in self.node.knownActions():
+            actionMenu.addAction(action)
+        selectedAction = menu.exec_(event.screenPos())
+
 class ActionNodeItem(NodeItem):
     def __init__(self, node):
         super(ActionNodeItem, self).__init__(node)
@@ -345,6 +369,12 @@ class ActionNodeItem(NodeItem):
         self.brush = QBrush(gradient)
         logging.debug("Created ActionNodeItem")
 
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+        make = menu.addAction('Run in tractor')
+        selectedAction = menu.exec_(event.screenPos())
+
+
 class DataNodeItem(NodeItem):
     def __init__(self, node):
         super(DataNodeItem, self).__init__(node)
@@ -356,5 +386,10 @@ class DataNodeItem(NodeItem):
         gradient.setColorAt(0,self.getTopColor(baseCol))
         self.brush = QBrush(gradient)
         logging.debug("Created DataNodeItem")
+
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+        make = menu.addAction('List versions')
+        selectedAction = menu.exec_(event.screenPos())
 
 
