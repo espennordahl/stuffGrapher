@@ -43,11 +43,13 @@ class MainWindow(QMainWindow):
         self.centralLayout.addWidget(self.graphLabel, alignment=Qt.AlignCenter)
 
         self.nodeGraph = NodeGraphView(self)
+        self.nodeGraph.mainWindow = self
         self.centralLayout.addWidget(self.nodeGraph)
 
         # Attribute Editor
         self.attributeEditor = AttributeEditor(self)
         self.addDockWidget(Qt.RightDockWidgetArea, self.attributeEditor)
+        self.nodeGraph.selectionChanged.connect(self.attributeEditor.setNodes)
 
         # Shot Browser
         self.shotBrowser = ShotBrowser(self)
@@ -128,8 +130,6 @@ class MainWindow(QMainWindow):
         importSGAction.setStatusTip("Import shots from Shotgun")
         importSGAction.triggered.connect(self.importShots)
         self.shotMenu.addAction(importSGAction)
-
-
 
         ## Node Menu
         self.nodeMenu = menuBar.addMenu("Nodes")

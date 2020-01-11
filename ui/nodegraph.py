@@ -6,23 +6,58 @@ from PyQt5.QtWidgets import *
 
 from .nodeitem import *
 
-from core import Graph, SceneFile, Action, Data
+from core import Node, Graph, SceneFile, Action, Data
 from core.attributes import *
 
 
 class NodeGraphView(QGraphicsView):
+    selectionChanged = pyqtSignal(list)
+
     def __init__(self, parent=None):
         super(NodeGraphView, self).__init__(parent)
         self.nodes = []
         self.shot = None
+        self.mousePos = QPoint(0,0)
 
         scene = QGraphicsScene()
         scene.setSceneRect(0,0,32000,32000) 
+        scene.selectionChanged.connect(self._selectionChanged)
         self.setScene(scene)
 
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
         self.setDragMode(QGraphicsView.RubberBandDrag)
+        self.setFocusPolicy(Qt.StrongFocus)
+
+    def contextMenuEvent(self, event):
+        self.createNodeMenu(event.globalPos())
+
+    def mouseMoveEvent(self, event):
+        self.mousePosGlobal = QPoint(event.globalPos())
+        self.mousePosLocal = QPoint(event.x(), event.y())
+        return super(NodeGraphView, self).mouseMoveEvent(event)
+
+    def event(self, event):
+        if (event.type()==QEvent.KeyPress) and (event.key()==Qt.Key_Tab):
+            self.createNodeMenu(self.mousePosGlobal)
+            return True
+        else:
+            return super(NodeGraphView, self).event(event)
+
+    def createNodeMenu(self, pos):
+        menu = QMenu()
+        self.mainWindow.buildCreateNodeMenu(menu)
+        selectedAction = menu.exec_(pos)
+
+    def _selectionChanged(self):
+        scene = self.scene()
+        selection = scene.selectedItems()
+        selectedNodes = []
+        for item in selection:
+            if hasattr(item, "node"):
+                if isinstance(item.node, Node):
+                    selectedNodes.append(item.node)
+        self.selectionChanged.emit(selectedNodes)
 
     def createNode(self, classname):
         if not self.shot:
@@ -33,7 +68,7 @@ class NodeGraphView(QGraphicsView):
 
         item = self.itemFromNode(node)
 
-        item.setPos(self.scene().width()/2, self.scene().height()/2)
+        item.setPos(self.mapToScene(self.mousePosLocal))
 
         self.addNodeItem(item)
 
