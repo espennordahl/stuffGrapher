@@ -148,11 +148,11 @@ class MainWindow(QMainWindow):
                     "PublishGeocache"
                     ]
         for actionname in actions:
-                action = QAction(actionname, self)
-                action.setStatusTip("Create {node}".format(node=actionname))
-                action.triggered.connect(
+            action = QAction(actionname, self)
+            action.setStatusTip("Create {node}".format(node=actionname))
+            action.triggered.connect(
                                 lambda checked, name=actionname + "Action": self.createNode(name))
-                actionsMenu.addAction(action)
+            actionsMenu.addAction(action)
 
         sceneMenu = menu.addMenu("Scenes")
         scenes  = [
@@ -161,11 +161,27 @@ class MainWindow(QMainWindow):
                         "Nuke"
                     ]
         for scenename in scenes:
-                action = QAction(scenename, self)
-                action.setStatusTip("Create {node}".format(node=scenename))
-                action.triggered.connect(
+            action = QAction(scenename, self)
+            action.setStatusTip("Create {node}".format(node=scenename))
+            action.triggered.connect(
                                 lambda checked, name=scenename + "File": self.createNode(name))
-                sceneMenu.addAction(action)
+            sceneMenu.addAction(action)
+
+        dataMenu = menu.addMenu("Data")
+        datatypes = [
+                    "Geo",
+                    "Geocache",
+                    "Render",
+                    "Comprender"
+                ]
+        for dataname in datatypes:
+            action = QAction(dataname, self)
+            action.setStatusTip("Create {node}".format(node=dataname))
+            action.triggered.connect(
+                                lambda checked, name=dataname + "Data": self.createNode(name))
+            dataMenu.addAction(action)
+
+
 
 
     def createNode(self, classname):
