@@ -2,10 +2,13 @@ import logging
 
 from .node import Node
 import core.actions
+from .attributes import *
 
 class SceneFile(Node):
     def __init__(self, match):
         super(SceneFile, self).__init__(match)
+        self.addAttribute(StringAttribute("department", "anim"))
+        self.addAttribute(StringAttribute("partname", "main"))
 
     def knownActions(self):
         return []
