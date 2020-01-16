@@ -135,6 +135,17 @@ class MainWindow(QMainWindow):
         self.nodeMenu = menuBar.addMenu("Nodes")
         self.buildCreateNodeMenu(self.nodeMenu)
 
+        # Tractor Menu
+        self.tractorMenu = menuBar.addMenu("Tractor")
+        
+        tractorScenefilesAction = QAction("Create Scenefile Templates", self)
+        self.tractorMenu.addAction(tractorScenefilesAction)
+
+        tractorActionsAction = QAction("Run Actions", self)
+        self.tractorMenu.addAction(tractorActionsAction)
+
+        tractorDataAction = QAction("Generate Data", self)
+        self.tractorMenu.addAction(tractorDataAction)
 
     def buildCreateNodeMenu(self, menu):
         
