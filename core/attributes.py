@@ -145,16 +145,18 @@ class InputAttribute(Attribute):
     @classmethod
     def deserialize(self, root):
         value = root["value"]
+        hidden = root["hidden"]
         if value == None:
-            obj = InputAttribute(root["key"], None)
+            obj = InputAttribute(root["key"], None, hidden)
         else:
-            obj = InputAttribute(root["key"], str(value))
+            obj = InputAttribute(root["key"], str(value), hidden)
         return obj
 
     def serialize(self):
         root = {}
         root["class"] = self.__class__.__name__
         root["key"] = self.key
+        root["hidden"] = self.hidden
         if self.value:
             root["value"] = str(self.value.name)
         else:
