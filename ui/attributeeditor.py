@@ -37,8 +37,8 @@ class AttributeEditor(QDockWidget):
         groupbox.setLayout(groupLayout)
 
         for attribute in node.attributes.values():
-            groupLayout.addWidget(self._createAttributeWidget(attribute))
-
+            if not attribute.hidden:
+                groupLayout.addWidget(self._createAttributeWidget(attribute))
         
 
     def _createAttributeWidget(self, attribute):
@@ -46,7 +46,24 @@ class AttributeEditor(QDockWidget):
         
         layout = QHBoxLayout()
         layout.addWidget(QLabel(attribute.key))
-        layout.addWidget(QLabel(str(attribute.value)))
+
+        ## String widget
+        if isinstance(attribute, StringAttribute):
+            valueWidget = QLineEdit(str(attribute.value))
+            layout.addWidget(valueWidget)
+        ## Enum widget
+        elif isinstance(attribute, EnumAttribute):
+            valueWidget = QComboBox()
+            logging.debug("Elements: " + str(attribute.elements))
+            valueWidget.addItems(attribute.elements)
+            layout.addWidget(valueWidget)
+        ## Bool widget
+        elif isinstance(attribute, BoolAttribute):
+            valueWidget = QCheckBox()
+            valueWidget.setChecked(attribute.value)
+            layout.addWidget(valueWidget)
+        else:
+            layout.addWidget(QLabel(str(attribute.value)))
  
         widget = QWidget()
         widget.setLayout(layout)

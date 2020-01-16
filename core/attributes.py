@@ -4,12 +4,13 @@ import copy
 import logging
 
 class Attribute:
-    def __init__(self, key, value=None):
+    def __init__(self, key, value=None, hidden=False):
         if isinstance(key, str):
             self.key = str(key)
         else:
             logging.error("Attribute names must be strings. Received: " + type(key))
         self.value = value
+        self.hidden = hidden
 
     @classmethod
     def deserialize(self, root):
@@ -30,18 +31,19 @@ class Attribute:
         root["class"] = self.__class__.__name__
         root["key"] = self.key
         root["value"] = str(self.value)
+        root["hidden"] = self.hidden
         return root
 
     def __eq__(self, other):
     	if not isinstance(other, self.__class__):
     		return False
-    	return self.key == other.key and self.value == other.value
+    	return self.key == other.key and self.value == other.value and self.hidden == other.hidden
 
 
 
 class BoolAttribute(Attribute):
-    def __init__(self, name, value=None):
-        super(BoolAttribute, self).__init__(name, value)
+    def __init__(self, name, value=None, hidden=False):
+        super(BoolAttribute, self).__init__(name, value, hidden)
 
     @classmethod
     def deserialize(self, root):
@@ -49,14 +51,14 @@ class BoolAttribute(Attribute):
         return obj
 
 class ColorAttribute(Attribute):
-    def __init__(self, name, value=None):
-        super(ColorAttribute, self).__init__(name, value)
+    def __init__(self, name, value=None, hidden=False):
+        super(ColorAttribute, self).__init__(name, value, hidden)
 
 class EnumAttribute(Attribute):
-    def __init__(self, name, elements=[], value=None):
+    def __init__(self, name, elements=[], value=None, hidden=False):
         self._value = None
         self.elements = copy.copy(elements)
-        super(EnumAttribute, self).__init__(name, value)
+        super(EnumAttribute, self).__init__(name, value, hidden)
 
     def addElement(self, element):
         self.elements.append(element)
@@ -93,15 +95,16 @@ class EnumAttribute(Attribute):
         name = root["key"]
         elements = root["elements"]
         value = root["value"]
-        obj = EnumAttribute(name, elements, value)
+        hidden = root["hidden"]
+        obj = EnumAttribute(name, elements, value, hidden)
         return obj
 
     def serialize(self):
-        root = {}
-        root["class"] = self.__class__.__name__
-        root["key"] = self.key
+        root = super(EnumAttribute, self).serialize()
+
         root["elements"] = self.elements
         root["value"] = self._value
+        
         return root
 
     def __eq__(self, other):
@@ -111,15 +114,17 @@ class EnumAttribute(Attribute):
             return False
         if self.elements != other.elements:
             return False
+        if self.hidden != other.hidden:
+            return False
         return True
 
 class FloatAttribute(Attribute):
-    def __init__(self, name, value=None):
-        super(FloatAttribute, self).__init__(name, value)
+    def __init__(self, name, value=None, hidden=False):
+        super(FloatAttribute, self).__init__(name, value, hidden)
 
 class StringAttribute(Attribute):
-    def __init__(self, name, value=None):
-        super(StringAttribute, self).__init__(name, value)
+    def __init__(self, name, value=None, hidden=False):
+        super(StringAttribute, self).__init__(name, value, hidden)
 
     @classmethod
     def deserialize(self, root):
@@ -127,8 +132,8 @@ class StringAttribute(Attribute):
         return obj
 
 class InputAttribute(Attribute):
-    def __init__(self, name, value=None):
-        super(InputAttribute, self).__init__(name, value)
+    def __init__(self, name, value=None, hidden=False):
+        super(InputAttribute, self).__init__(name, value, hidden)
 
     @classmethod
     def deserialize(self, root):

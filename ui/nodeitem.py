@@ -146,7 +146,7 @@ class NodeSocket(QGraphicsItem):
             self.scene().addItem(self.newLine)
         elif self.type == 'in':
             rect = self.boundingRect()
-            pointA = self.mapToScene(event.pos())
+            pointA = self.mapToScene(pos)
             pointB = QPointF(rect.x() + rect.width()/2, rect.y() + rect.height()/2)
             pointB = self.mapToScene(pointB)
             self.newLine = NodeLine(pointA, pointB)
@@ -215,9 +215,9 @@ class NodeItem(QGraphicsItem):
         self.node = node
         if self.node:
             if not self.node.hasAttribute("pos.x"):
-                self.node.addAttribute(FloatAttribute("pos.x", self.pos().x))
+                self.node.addAttribute(FloatAttribute("pos.x", self.pos().x, hidden=True))
             if not self.node.hasAttribute("pos.y"):
-                self.node.addAttribute(FloatAttribute("pos.y", self.pos().y))
+                self.node.addAttribute(FloatAttribute("pos.y", self.pos().y, hidden=True))
 
         self.input = None
         self.output = None

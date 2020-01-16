@@ -4,11 +4,25 @@ from .node import Node
 import core.actions
 from .attributes import *
 
+departments = [
+                "anim",
+                "conform",
+                "comp",
+                "fx",
+                "layout",
+                "lookdev"
+                "model",
+                "rig",
+                "txtr"
+            ]
+
 class SceneFile(Node):
     def __init__(self, match):
         super(SceneFile, self).__init__(match)
-        self.addAttribute(StringAttribute("department", "anim"))
+        self.addAttribute(EnumAttribute("department", departments))
+
         self.addAttribute(StringAttribute("partname", "main"))
+
         self.addAttribute(EnumAttribute("template"))
 
     def knownActions(self):
