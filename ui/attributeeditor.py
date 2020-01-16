@@ -5,6 +5,9 @@ from PyQt5.QtWidgets import *
 from core.attributes import *
 
 class AttributeEditor(QDockWidget):
+
+    attributeChanged = pyqtSignal()
+
     def __init__(self, parent=None):
         super(QDockWidget, self).__init__("Attribute Editor")
         scrollArea = QScrollArea()
@@ -50,17 +53,23 @@ class AttributeEditor(QDockWidget):
         ## String widget
         if isinstance(attribute, StringAttribute):
             valueWidget = QLineEdit(str(attribute.value))
+            valueWidget.textChanged.connect(attribute.setValue)
+            valueWidget.textChanged.connect(self.attributeChanged)
             layout.addWidget(valueWidget)
         ## Enum widget
         elif isinstance(attribute, EnumAttribute):
             valueWidget = QComboBox()
-            logging.debug("Elements: " + str(attribute.elements))
             valueWidget.addItems(attribute.elements)
+            valueWidget.setCurrentText(attribute.value)
+            valueWidget.currentTextChanged.connect(attribute.setValue)
+            valueWidget.currentTextChanged.connect(self.attributeChanged)
             layout.addWidget(valueWidget)
         ## Bool widget
         elif isinstance(attribute, BoolAttribute):
             valueWidget = QCheckBox()
             valueWidget.setChecked(attribute.value)
+            valueWidget.stateChanged.connect(attribute.setValue)
+            valueWidget.stateChanged.connect(self.attributeChanged)
             layout.addWidget(valueWidget)
         else:
             layout.addWidget(QLabel(str(attribute.value)))

@@ -10,7 +10,8 @@ departments = [
                 "comp",
                 "fx",
                 "layout",
-                "lookdev"
+                "lookdev",
+                "lit",
                 "model",
                 "rig",
                 "txtr"
@@ -19,10 +20,16 @@ departments = [
 class SceneFile(Node):
     def __init__(self, match):
         super(SceneFile, self).__init__(match)
-        self.addAttribute(InputAttribute("input"))
+        self.addAttribute(InputAttribute("input", hidden=True))
         self.addAttribute(EnumAttribute("department", departments))
         self.addAttribute(StringAttribute("partname", "main"))
         self.addAttribute(EnumAttribute("template"))
+
+    def visualName(self):
+        return "{department}_{partname}".format(
+                department=self.attributes["department"].value, 
+                partname=self.attributes["partname"].value
+                )
 
     def knownActions(self):
         return []

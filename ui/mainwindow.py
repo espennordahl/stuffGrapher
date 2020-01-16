@@ -48,6 +48,7 @@ class MainWindow(QMainWindow):
         self.attributeEditor = AttributeEditor(self)
         self.addDockWidget(Qt.RightDockWidgetArea, self.attributeEditor)
         self.nodeGraph.selectionChanged.connect(self.attributeEditor.setNodes)
+        self.attributeEditor.attributeChanged.connect(self.nodeGraph.scene().update)
 
         # Shot Browser
         self.shotBrowser = ShotBrowser(self)

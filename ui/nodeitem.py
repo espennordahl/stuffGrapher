@@ -123,7 +123,7 @@ class NodeSocket(QGraphicsItem):
             rect = self.boundingRect()
             pointB = QPointF(rect.x() + rect.width()/2, rect.y() + rect.height()/2)
             pointB = self.mapToScene(pointB)
-            pointA = self.mapToScene(item.output.getCenter())
+            pointA = item.output.getCenter()
             
             line = NodeLine(pointA, pointB)
             line.source = item.output
@@ -132,7 +132,6 @@ class NodeSocket(QGraphicsItem):
             self.inLines.append(line)
             item.output.outLines.append(line)
             self.scene().addItem(line)
-
             line.updatePath()
 
     def createNewLine(self, pos):
@@ -169,6 +168,7 @@ class NodeSocket(QGraphicsItem):
             item.parentItem().addInput(self.parentItem())
             item.parentItem().input.inLines.append(self.newLine)
             self.newLine = None
+            self.scene().update()
         elif self.type == 'in' and item.type == 'out':
             self.newLine.pointA = item.getCenter()
             self.newLine.source = item
@@ -176,6 +176,7 @@ class NodeSocket(QGraphicsItem):
             self.parentItem().addInput(item.parentItem())
             item.parentItem().output.outLines.append(self.newLine)
             self.newLine = None
+            self.scene().update()
 
     def removeNewLine(self):
         if self.newLine in self.outLines:
@@ -282,14 +283,22 @@ class NodeItem(QGraphicsItem):
         else:
             painter.setPen(self.pen)
         
+        ## Draw node border
         painter.drawRoundedRect(self.rect, 5.0, 5.0)
-        
+       
+        ## Set up text drawing
         font = painter.font()
         font.setBold(True)
         font.setPointSize(12)
         painter.setFont(font)
         painter.setPen(Qt.black)
-        painter.drawText(self.rect.adjusted(0,0,-5,0), Qt.AlignCenter, self.node.name)
+        textMargin = 8
+
+        ## Node Name
+        painter.drawText(self.rect.adjusted(0,textMargin,-5,-textMargin), Qt.AlignHCenter | Qt.AlignTop, self.node.name)
+
+        ## Node path
+        painter.drawText(self.rect.adjusted(0,textMargin,-5,-textMargin), Qt.AlignHCenter | Qt.AlignBottom, self.node.visualName())
 
     def mouseMoveEvent(self, event):
         super(NodeItem, self).mouseMoveEvent(event)

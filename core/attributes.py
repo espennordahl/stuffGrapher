@@ -24,7 +24,9 @@ class Attribute:
         cls = getattr(sys.modules[__name__], classname)
         obj = cls.deserialize(root)
         return obj
-            
+
+    def setValue(self, value):
+        self.value = value
 
     def serialize(self):
         root = {}
@@ -56,8 +58,11 @@ class ColorAttribute(Attribute):
 
 class EnumAttribute(Attribute):
     def __init__(self, name, elements=[], value=None, hidden=False):
-        self._value = None
         self.elements = copy.copy(elements)
+        if len(self.elements):
+            self._value = 0
+        else:
+            self._value = None
         super(EnumAttribute, self).__init__(name, value, hidden)
 
     def addElement(self, element):
@@ -88,7 +93,7 @@ class EnumAttribute(Attribute):
             if value not in self.elements:
                 logging.warning("Enum value must be in elements")
             else:
-                value = self.elements.index(value)
+                self._value = self.elements.index(value)
 
     @classmethod
     def deserialize(self, root):

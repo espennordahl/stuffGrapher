@@ -10,6 +10,10 @@ class HoudiniFile(SceneFile):
         ## Templates
         self.attributes["template"].addElement("FXTemplate")
         self.attributes["template"].addElement("LayoutTemplate")
+        self.attributes["template"].value = "FXTemplate"
+
+        ## Default department
+        self.attributes["department"].value = "fx"
 
     def knownActions(self):
         return [

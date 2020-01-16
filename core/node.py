@@ -13,6 +13,9 @@ class Node:
         self.graph = None
         self._name = self.__class__.__name__
 
+    def visualName(self):
+        return self.name
+
     @property
     def name(self):
         return self._name

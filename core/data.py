@@ -6,7 +6,13 @@ from .attributes import *
 class Data(Node):
     def __init__(self, match):
         super(Data, self).__init__(match)
-        self.addAttribute(InputAttribute("action", None))
+        self.addAttribute(InputAttribute("action", None,hidden=True))
+
+    def visualName(self):
+        if self.attributes["action"].value:
+            return self.attributes["action"].value.visualName()
+        else:
+            return self.name
 
 
 class GeoData(Data):

@@ -11,6 +11,14 @@ class NukeFile(SceneFile):
         self.attributes["template"].addElement("MatchMoveTemplate")
         self.attributes["template"].addElement("SlapcompTemplate")
         self.attributes["template"].addElement("VersionZeroTemplate")
+        self.attributes["template"].value = "CompTemplate"
+
+        ## Default department
+        self.attributes["department"].value = "comp"
+
+
+        ## Default partname
+        self.attributes["partname"].value = "master"
 
     def knownActions(self):
         return [

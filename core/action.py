@@ -6,8 +6,18 @@ from .attributes import *
 class Action(Node):
     def __init__(self, match):
         super(Action, self).__init__(match)
-        self.addAttribute(InputAttribute("scenefile", None))
- 
+        self.addAttribute(InputAttribute("scenefile", None, hidden=True))
+        self.addAttribute(StringAttribute("subpart", "default"))
+
+    def visualName(self):
+        if self.attributes["scenefile"].value:
+            return "{scenefile}_{subpart}".format(
+                            scenefile=self.attributes["scenefile"].value.visualName(),
+                            subpart=self.attributes["subpart"].value
+                            )
+        else:
+            return self.name
+
     @classmethod
     def deserialize(cls, root):
         import core.actions
