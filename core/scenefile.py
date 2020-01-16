@@ -9,6 +9,7 @@ class SceneFile(Node):
         super(SceneFile, self).__init__(match)
         self.addAttribute(StringAttribute("department", "anim"))
         self.addAttribute(StringAttribute("partname", "main"))
+        self.addAttribute(EnumAttribute("template"))
 
     def knownActions(self):
         return []

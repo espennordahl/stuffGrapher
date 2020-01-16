@@ -1,4 +1,5 @@
 import sys
+import copy
 
 import logging
 
@@ -50,6 +51,67 @@ class BoolAttribute(Attribute):
 class ColorAttribute(Attribute):
     def __init__(self, name, value=None):
         super(ColorAttribute, self).__init__(name, value)
+
+class EnumAttribute(Attribute):
+    def __init__(self, name, elements=[], value=None):
+        self._value = None
+        self.elements = copy.copy(elements)
+        super(EnumAttribute, self).__init__(name, value)
+
+    def addElement(self, element):
+        self.elements.append(element)
+        if self._value == None:
+            self.value = self.elements.index(element)
+
+    def removeElement(self, element):
+        self.elements.remove(element)
+
+    @property
+    def value(self):
+        if self.elements:
+            return self.elements[self._value]
+        else:
+            return False
+
+    @value.setter
+    def value(self, value):
+        if isinstance(value, (bool, type(None))):
+            return
+        elif isinstance(value, int): 
+            if value >= len(self.elements):
+                logging.warning("Enum index out of range")
+            else:
+                self._value = value
+        else:
+            if value not in self.elements:
+                logging.warning("Enum value must be in elements")
+            else:
+                value = self.elements.index(value)
+
+    @classmethod
+    def deserialize(self, root):
+        name = root["key"]
+        elements = root["elements"]
+        value = root["value"]
+        obj = EnumAttribute(name, elements, value)
+        return obj
+
+    def serialize(self):
+        root = {}
+        root["class"] = self.__class__.__name__
+        root["key"] = self.key
+        root["elements"] = self.elements
+        root["value"] = self._value
+        return root
+
+    def __eq__(self, other):
+        if self.key != other.key:
+            return False
+        if self.value != other.value:
+            return False
+        if self.elements != other.elements:
+            return False
+        return True
 
 class FloatAttribute(Attribute):
     def __init__(self, name, value=None):

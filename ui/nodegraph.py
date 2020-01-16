@@ -17,7 +17,8 @@ class NodeGraphView(QGraphicsView):
         super(NodeGraphView, self).__init__(parent)
         self.nodes = []
         self.shot = None
-        self.mousePos = QPoint(0,0)
+        self.mousePosLocal = QPoint(0,0)
+        self.mousePosGlobal = QPoint(0,0)
 
         scene = QGraphicsScene()
         scene.setSceneRect(0,0,32000,32000) 
