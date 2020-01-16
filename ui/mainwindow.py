@@ -17,8 +17,6 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         
-        self.shots = {}
-
         self.setWindowTitle("StuffGrapher")
         self._initUI()
         self._initMenuBar()
@@ -211,15 +209,12 @@ class MainWindow(QMainWindow):
                         "vg080"
                         ]
         for shotname in tempshots:
-            if shotname in self.shots:
-                continue
             shot = Shot(shotname)
             shot.graph = Graph()
-            self.shots[shotname] = shot
-            self.shotBrowser.addShot(shotname)
+            self.shotBrowser.addShot(shot)
 
     def shotChanged(self, shotname):
         self.graphLabel.setText(shotname)
-        self.nodeGraph.setShot(self.shots[shotname])
+        self.nodeGraph.setShot(self.shotBrowser.shots[shotname])
 
 
