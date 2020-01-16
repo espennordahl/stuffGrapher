@@ -110,7 +110,8 @@ class Graph:
             for attribute in node.attributes.values():
                 if isinstance(attribute, InputAttribute):
                     nodename = attribute.value
-                    attribute.value = graph.nodes[nodename]
+                    if nodename:
+                        attribute.value = graph.nodes[nodename]
 
         return graph
 

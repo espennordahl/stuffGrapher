@@ -19,10 +19,9 @@ departments = [
 class SceneFile(Node):
     def __init__(self, match):
         super(SceneFile, self).__init__(match)
+        self.addAttribute(InputAttribute("input"))
         self.addAttribute(EnumAttribute("department", departments))
-
         self.addAttribute(StringAttribute("partname", "main"))
-
         self.addAttribute(EnumAttribute("template"))
 
     def knownActions(self):

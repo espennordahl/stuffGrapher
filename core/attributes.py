@@ -70,7 +70,7 @@ class EnumAttribute(Attribute):
 
     @property
     def value(self):
-        if self.elements:
+        if self.elements and self._value != None:
             return self.elements[self._value]
         else:
             return False
@@ -108,6 +108,8 @@ class EnumAttribute(Attribute):
         return root
 
     def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
         if self.key != other.key:
             return False
         if self.value != other.value:
