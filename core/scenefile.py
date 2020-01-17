@@ -10,10 +10,10 @@ departments = [
                 "comp",
                 "fx",
                 "layout",
-                "lookdev",
                 "lit",
                 "model",
                 "rig",
+                "shd",
                 "txtr"
             ]
 

@@ -75,6 +75,20 @@ class AttributeEditor(QDockWidget):
             layout.addWidget(QLabel(str(attribute.value)))
  
         widget = QWidget()
+        widget.setStyleSheet(
+	        """
+		QComboBox::item:checked {
+		height: 12px;
+		border: 1px solid #32414B;
+		margin-top: 0px;
+		margin-bottom: 0px;
+		padding: 4px;
+		padding-left: 0px;
+		}
+		"""
+        )
+
+
         widget.setLayout(layout)
         return widget
 
