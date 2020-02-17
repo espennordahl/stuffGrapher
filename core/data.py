@@ -44,6 +44,10 @@ class LookdevData(Data):
     def __init__(self, match):
        super(LookdevData, self).__init__(match)
 
+class PlateData(Data):
+    def __init__(self, match):
+       super(PlateData, self).__init__(match)
+
 class RenderData(Data):
     def __init__(self, match):
        super(RenderData, self).__init__(match)

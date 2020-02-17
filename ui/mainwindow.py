@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
         
         # Window Size
         self.setMinimumSize(400, 400)
-        self.setGeometry(100, 100, 1500, 900)
+        self.setGeometry(0, 0, 1920, 1080)
 
         # NodeGraph
         self.centralWidget = QFrame()
@@ -181,6 +181,8 @@ class MainWindow(QMainWindow):
         datatypes = [
                     "Geo",
                     "Geocache",
+                    "Lookdev",
+                    "Plate",
                     "Render",
                     "Comprender"
                 ]
