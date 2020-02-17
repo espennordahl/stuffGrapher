@@ -80,10 +80,10 @@ class NodeLine(QGraphicsPathItem):
 
 
 class NodeSocket(QGraphicsItem):
-    def __init__(self, rect, parent, socketType):
+    def __init__(self, rect, parent, attribute):
         super(NodeSocket, self).__init__(parent)
         self.rect = rect
-        self.type = socketType
+        self.attribute = attribute
 
         # Brush.
         self.brush = QBrush()
@@ -114,28 +114,8 @@ class NodeSocket(QGraphicsItem):
         painter.setPen(self.pen)
         painter.drawEllipse(self.rect)
 
-    def addConnection(self, item):
-        if self.type == 'in':
-            logging.debug("adding input connection between {i} and {o}".format(
-                                i=self.parentItem().node.name,
-                                o=item.node.name))
-            
-            rect = self.boundingRect()
-            pointB = QPointF(rect.x() + rect.width()/2, rect.y() + rect.height()/2)
-            pointB = self.mapToScene(pointB)
-            pointA = item.output.getCenter()
-            
-            line = NodeLine(pointA, pointB)
-            line.source = item.output
-            line.target = self
-
-            self.inLines.append(line)
-            item.output.outLines.append(line)
-            self.scene().addItem(line)
-            line.updatePath()
-
     def createNewLine(self, pos):
-        if self.type == 'out':
+        if isinstance(self.attribute, OutputAttribute):
             rect = self.boundingRect()
             pointA = QPointF(rect.x() + rect.width()/2, rect.y() + rect.height()/2)
             pointA = self.mapToScene(pointA)
@@ -143,7 +123,7 @@ class NodeSocket(QGraphicsItem):
             self.newLine = NodeLine(pointA, pointB)
             self.outLines.append(self.newLine)
             self.scene().addItem(self.newLine)
-        elif self.type == 'in':
+        elif isinstance(self.attribute, InputAttribute):
             rect = self.boundingRect()
             pointA = self.mapToScene(pos)
             pointB = QPointF(rect.x() + rect.width()/2, rect.y() + rect.height()/2)
@@ -154,31 +134,39 @@ class NodeSocket(QGraphicsItem):
  
     def updateNewLine(self, pos):
         point = self.mapToScene(pos)
-        if self.type == 'out':
+        if isinstance(self.attribute, OutputAttribute):
             self.newLine.pointB = point
-        elif self.type == 'in':
+        elif isinstance(self.attribute, InputAttribute):
             self.newLine.pointA = point
 
     def connectToItem(self, item):
         logging.debug("Trying to connect to item")
-        if self.type == 'out' and item.type == 'in':
-            self.newLine.pointB = item.getCenter()
-            self.newLine.source = self
-            self.newLine.target = item
-            item.parentItem().addInput(self.parentItem())
-            item.parentItem().input.inLines.append(self.newLine)
-            self.newLine = None
-            self.scene().update()
-        elif self.type == 'in' and item.type == 'out':
-            self.newLine.pointA = item.getCenter()
-            self.newLine.source = item
-            self.newLine.target = self
-            self.parentItem().addInput(item.parentItem())
-            item.parentItem().output.outLines.append(self.newLine)
-            self.newLine = None
-            self.scene().update()
+        if isinstance(self.attribute, OutputAttribute) and isinstance(item.attribute, InputAttribute):
+            fro = self
+            to = item
+        elif isinstance(self.attribute, InputAttribute) and isinstance(item.attribute, OutputAttribute):
+            fro = item
+            to = self
+        else:
+            logging.debug("Unable to connect items")
+            return
+        
+        if not self.newLine:
+            self.newLine = self.createNewLine(0,0)
+        self.newLine.pointA = fro.getCenter()
+        self.newLine.pointB = to.getCenter()
+        self.newLine.source = fro
+        self.newLine.target = to
+        to.attribute.value = fro.parentItem().node
+        to.inLines.append(self.newLine)
+        fro.outLines.append(self.newLine)
+        self.newLine.updatePath()
+        self.newLine = None
+        self.scene().update()
+ 
 
     def removeNewLine(self):
+        logging.debug("Removing temp line")
         if self.newLine in self.outLines:
             self.outLines.remove(self.newLine)
         else:
@@ -197,7 +185,7 @@ class NodeSocket(QGraphicsItem):
 
     def mouseReleaseEvent(self, event):
         item = self.scene().itemAt(event.scenePos().toPoint(), QTransform())
-        if item:
+        if isinstance(item, NodeSocket):
             self.connectToItem(item)
         if self.newLine:
             self.removeNewLine()
@@ -220,8 +208,8 @@ class NodeItem(QGraphicsItem):
             if not self.node.hasAttribute("pos.y"):
                 self.node.addAttribute(FloatAttribute("pos.y", self.pos().y, hidden=True))
 
-        self.input = None
-        self.output = None
+        self.inputs = []
+        self.outputs = []
 
         textWidth = len(node.name) * 10
         nodeWidth = max(100, min(textWidth, 200))
@@ -253,19 +241,25 @@ class NodeItem(QGraphicsItem):
 
     def initUi(self):
         socketSize = 16
-        for attribute in self.node.attributes.values():
-            if isinstance(attribute, InputAttribute):
-                self.input = NodeSocket(QRect(
-                                                -socketSize/2,
-                                                self.rect.height()/2-socketSize/2,
-                                                socketSize,
-                                                socketSize
-                                                ), self, 'in')
-        self.output = NodeSocket(QRect(
-                                        self.rect.width()-socketSize/2,
-                                        self.rect.height()/2-socketSize/2,
+
+        inputs = self.node.inputs()
+        for attribute in inputs:
+            socket =  NodeSocket(QRect(
+                                        -socketSize/2,
+                                        self.rect.height()/(len(inputs)+1) - socketSize/2,
                                         socketSize,
-                                        socketSize), self, 'out')
+                                        socketSize
+                                        ), self, attribute)
+            self.inputs.append(socket)
+
+        outputs = self.node.outputs()
+        for attribute in outputs:
+            socket = NodeSocket(QRect(
+                                        self.rect.width()-socketSize/2,
+                                        self.rect.height()/(len(outputs)+1) - socketSize/2,
+                                        socketSize,
+                                        socketSize), self, attribute)
+            self.outputs.append(socket)
 
     def shape(self):
         path = QPainterPath()
@@ -302,12 +296,12 @@ class NodeItem(QGraphicsItem):
 
     def mouseMoveEvent(self, event):
         super(NodeItem, self).mouseMoveEvent(event)
-        if self.output:
-            for line in self.output.outLines:
+        for output in self.outputs:
+            for line in output.outLines:
                 line.pointA = line.source.getCenter()
                 line.pointB = line.target.getCenter()
-        if self.input:
-            for line in self.input.inLines:
+        for inpt in self.inputs:
+            for line in inpt.inLines:
                 line.pointA = line.source.getCenter()
                 line.pointB = line.target.getCenter()
 
@@ -318,26 +312,20 @@ class NodeItem(QGraphicsItem):
                 self.node["pos.y"].value = self.pos().y
         return QGraphicsItem.itemChange(self, change, value)
 
-    def createConnections(self):
-        for attribute in self.node.attributes.values():
-            if isinstance(attribute, InputAttribute):
-                if not attribute.value:
-                    continue
-                logging.debug("Creating intput connection")
-                items = self.scene().items()
-                item = None
-                for x in items:
-                    if isinstance(x, NodeItem):
-                        if x.node == attribute.value:
-                            item = x
-                if not item:
-                    logging.error("Couldn't find item by name: " + str(attribute.value.name))
-                self.input.addConnection(item)
-
-    def addInput(self, item):
-        for attribute in self.node.attributes.values():
-            if isinstance(attribute, InputAttribute):
-                attribute.value = item.node
+    def connectInputs(self):
+        for input in self.inputs:
+            if not input.attribute.value:
+                continue
+            logging.debug("Creating intput connection")
+            items = self.scene().items()
+            item = None
+            for x in items:
+                if isinstance(x, NodeItem):
+                    if x.node == input.attribute.value:
+                        item = x
+            if not item:
+                logging.error("Couldn't find item by name: " + str(input.attribute.value.name))
+            input.connectToItem(item)
 
     def getBaseColor(self, hue):
         return QColor.fromHsv(hue,120,100)

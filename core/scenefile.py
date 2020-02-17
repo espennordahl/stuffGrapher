@@ -67,6 +67,8 @@ class SceneFile(Node):
         attributes = root["attributes"]
         for attrname in attributes:
             attribute = Attribute.deserialize(attributes[attrname])
+            if isinstance(attribute, OutputAttribute):
+                attribute.value = obj
             if attrname in obj.attributes:
                 obj[attrname] = attribute
             else:

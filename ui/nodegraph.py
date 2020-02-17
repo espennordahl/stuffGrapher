@@ -115,6 +115,6 @@ class NodeGraphView(QGraphicsView):
 
             ## Then connections
             for item in items:
-                item.createConnections()
+                item.connectInputs()
         
         self.scene().update()

@@ -37,11 +37,18 @@ class Attribute:
         return root
 
     def __eq__(self, other):
-    	if not isinstance(other, self.__class__):
-    		return False
-    	return self.key == other.key and self.value == other.value and self.hidden == other.hidden
-
-
+        if not isinstance(other, self.__class__):
+            return False
+        if self.key != other.key:
+            return False
+        if self.hidden != other.hidden:
+            return False
+        if hasattr(self.value, "attributes"):
+            ## This feels a little dirty, but if we don't do this,
+            ## we cause an infinite recursion
+            return self.value.name == other.value.name
+        else:
+            return self.value == other.value
 
 class BoolAttribute(Attribute):
     def __init__(self, name, value=None, hidden=False):
@@ -163,4 +170,23 @@ class InputAttribute(Attribute):
             root["value"] = None
         return root
 
+class OutputAttribute(Attribute):
+    def __init__(self, name, value=None, hidden=False):
+        super(OutputAttribute, self).__init__(name, value, hidden)
 
+    @classmethod
+    def deserialize(self, root):
+        hidden = root["hidden"]
+        obj = OutputAttribute(root["key"], None, hidden)
+        return obj
+
+    def serialize(self):
+        root = {}
+        root["class"] = self.__class__.__name__
+        root["key"] = self.key
+        root["hidden"] = self.hidden
+        if self.value:
+            root["value"] = str(self.value.name)
+        else:
+            root["value"] = None
+        return root

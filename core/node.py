@@ -12,6 +12,7 @@ class Node:
         self.match = match
         self.graph = None
         self._name = self.__class__.__name__
+        self.addAttribute(OutputAttribute("out", self, hidden=True))
 
     def visualName(self):
         return self.name
@@ -44,6 +45,20 @@ class Node:
             self.graph.addNode(self)
 
 
+    def inputs(self):
+        attrs = []
+        for attribute in self.attributes.values():
+            if isinstance(attribute, InputAttribute):
+                attrs.append(attribute)
+        return attrs
+
+    def outputs(self):
+        attrs = []
+        for attribute in self.attributes.values():
+            if isinstance(attribute, OutputAttribute):
+                attrs.append(attribute)
+        return attrs
+
     @classmethod
     def deserialize(cls, root):
         if root["class"] != "Node":
@@ -53,6 +68,8 @@ class Node:
         attributes = root["attributes"]
         for attrname in attributes:
             attribute = Attribute.deserialize(attributes[attrname])
+            if isinstance(attribute, OutputAttribute):
+                attribute.value = obj
             if attrname in obj.attributes:
                 obj[attrname] = attribute
             else:
