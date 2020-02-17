@@ -148,6 +148,7 @@ class StringAttribute(Attribute):
 class InputAttribute(Attribute):
     def __init__(self, name, value=None, hidden=False):
         super(InputAttribute, self).__init__(name, value, hidden)
+        self._connectionCallback = None
 
     @classmethod
     def deserialize(self, root):
@@ -169,6 +170,21 @@ class InputAttribute(Attribute):
         else:
             root["value"] = None
         return root
+
+    def setConnectionCallback(self, callback):
+        self._connectionCallback = callback
+
+    def isLegalConnection(self, connection):
+        if not isinstance(connection, OutputAttribute):
+            return False
+        if self._connectionCallback:
+            return self._connectionCallback(connection)
+        ## Default to all connections being legal
+        return True
+
+class ArrayInputAttribute(InputAttribute):
+    def __init__(self, name, value=None, hidden=False):
+        super(ArrayInputAttribute, self).__init__(name, value, hidden)
 
 class OutputAttribute(Attribute):
     def __init__(self, name, value=None, hidden=False):

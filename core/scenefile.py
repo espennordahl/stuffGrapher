@@ -1,6 +1,7 @@
 import logging
 
 from .node import Node
+from .data import Data
 import core.actions
 from .attributes import *
 
@@ -20,7 +21,9 @@ departments = [
 class SceneFile(Node):
     def __init__(self, match):
         super(SceneFile, self).__init__(match)
-        self.addAttribute(InputAttribute("input", hidden=True))
+        inputAttr = InputAttribute("input", hidden=True)
+        inputAttr.setConnectionCallback(self._checkInputConnection)
+        self.addAttribute(inputAttr)
         self.addAttribute(EnumAttribute("department", departments))
         self.addAttribute(StringAttribute("partname", "main"))
         self.addAttribute(EnumAttribute("template"))
@@ -75,4 +78,10 @@ class SceneFile(Node):
                 obj.addAttribute(attribute)
 
         return obj
+
+    def _checkInputConnection(self, connection):
+        if not isinstance(connection, OutputAttribute):
+            logging.debug("Connection not an OutputAttribute")
+            return False
+        return isinstance(connection.value, Data)
 

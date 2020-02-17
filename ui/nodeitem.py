@@ -68,6 +68,8 @@ class NodeLine(QGraphicsPathItem):
 
     @source.setter
     def source(self, widget):
+        if self._source:
+            self._source.outLines.remove(self)
         self._source = widget
 
     @property
@@ -76,6 +78,8 @@ class NodeLine(QGraphicsPathItem):
 
     @target.setter
     def target(self, widget):
+        if self._target:
+            self._target.inLines.remove(self)
         self._target = widget
 
 
@@ -148,8 +152,12 @@ class NodeSocket(QGraphicsItem):
             fro = item
             to = self
         else:
-            logging.debug("Unable to connect items")
-            return
+            logging.debug("Items not input/output pair")
+            return False
+
+        if not to.attribute.isLegalConnection(fro.attribute):
+            logging.debug("Illegal connection")
+            return False
         
         if not self.newLine:
             self.newLine = self.createNewLine(0,0)
@@ -157,13 +165,23 @@ class NodeSocket(QGraphicsItem):
         self.newLine.pointB = to.getCenter()
         self.newLine.source = fro
         self.newLine.target = to
-        to.attribute.value = fro.parentItem().node
-        to.inLines.append(self.newLine)
-        fro.outLines.append(self.newLine)
+
+        if isinstance(to.attribute, ArrayInputAttribute):
+            to.attribute.value.append(fro.parentItem().node)
+            to.inLines.append(self.newLine)
+        else:
+            to.attribute.value = fro.parentItem().node
+            to.clearInLines()
+            to.inLines.append(self.newLine)
+
+        if self.newLine not in fro.outLines:
+            fro.outLines.append(self.newLine)
+
         self.newLine.updatePath()
         self.newLine = None
         self.scene().update()
- 
+
+        return True
 
     def removeNewLine(self):
         logging.debug("Removing temp line")
@@ -196,7 +214,10 @@ class NodeSocket(QGraphicsItem):
         center = self.mapToScene(center)
         return center
 
-
+    def clearInLines(self):
+        for line in self.inLines:
+            self.scene().removeItem(line)
+        self.inLines = []
 
 class NodeItem(QGraphicsItem):
     def __init__(self, node=None):

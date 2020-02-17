@@ -6,6 +6,8 @@ from .attributes import *
 class Action(Node):
     def __init__(self, match):
         super(Action, self).__init__(match)
+        inputAttr = InputAttribute("scenefile", None, hidden=True)
+        inputAttr.setConnectionCallback(self._checkInputConnection)
         self.addAttribute(InputAttribute("scenefile", None, hidden=True))
         self.addAttribute(StringAttribute("subpart", "default"))
 
@@ -42,4 +44,11 @@ class Action(Node):
                 obj.addAttribute(attribute)
 
         return obj
+
+    def _checkInputConnection(self, connection):
+        if not isinstance(connection, OutputAttribute):
+            logging.debug("Connection not an OutputAttribute")
+            return False
+        from .scenefile import SceneFile
+        return isinstance(connection.value, SceneFile)
 

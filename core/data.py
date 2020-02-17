@@ -6,6 +6,8 @@ from .attributes import *
 class Data(Node):
     def __init__(self, match):
         super(Data, self).__init__(match)
+        inputAttr = InputAttribute("action", None, hidden=True)
+        inputAttr.setConnectionCallback(self._checkInputConnection)
         self.addAttribute(InputAttribute("action", None,hidden=True))
 
     def visualName(self):
@@ -14,10 +16,25 @@ class Data(Node):
         else:
             return self.name
 
+    def _checkInputConnection(self, connection):
+        if not isinstance(connection, OutputAttribute):
+            logging.debug("Connection not an OutputAttribute")
+            return False
+        from .action import Action
+        return isinstance(connection.value, Action)
 
 class GeoData(Data):
     def __init__(self, match):
        super(GeoData, self).__init__(match)
+
+    def _checkInputConnection(self, connection):
+        if not isinstance(connection, OutputAttribute):
+            logging.debug("Connection not an OutputAttribute")
+            return False
+        from .actions import PublishGeoAction
+        return isinstance(connection.value, PublishGeoAction)
+
+
 
 class GeocacheData(Data):
     def __init__(self, match):
