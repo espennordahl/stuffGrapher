@@ -118,7 +118,7 @@ class NodeSocket(QGraphicsItem):
         painter.setPen(self.pen)
         painter.drawEllipse(self.rect)
 
-    def createNewLine(self, pos):
+    def createNewLine(self, pos=QPointF(0,0)):
         if isinstance(self.attribute, OutputAttribute):
             rect = self.boundingRect()
             pointA = QPointF(rect.x() + rect.width()/2, rect.y() + rect.height()/2)
@@ -135,6 +135,8 @@ class NodeSocket(QGraphicsItem):
             self.newLine = NodeLine(pointA, pointB)
             self.inLines.append(self.newLine)
             self.scene().addItem(self.newLine)
+        else:
+            logging.error("Unable to create new line. Attribute is not input or output")
  
     def updateNewLine(self, pos):
         point = self.mapToScene(pos)
@@ -160,7 +162,7 @@ class NodeSocket(QGraphicsItem):
             return False
         
         if not self.newLine:
-            self.newLine = self.createNewLine(0,0)
+            self.createNewLine()
         self.newLine.pointA = fro.getCenter()
         self.newLine.pointB = to.getCenter()
         self.newLine.source = fro
@@ -346,7 +348,8 @@ class NodeItem(QGraphicsItem):
                         item = x
             if not item:
                 logging.error("Couldn't find item by name: " + str(input.attribute.value.name))
-            input.connectToItem(item)
+            ## TODO: We should connect to attributes and not nodes..
+            input.connectToItem(item.outputs[0])
 
     def getBaseColor(self, hue):
         return QColor.fromHsv(hue,120,100)

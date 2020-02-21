@@ -78,7 +78,7 @@ class RenderData(Data):
         if not isinstance(connection, OutputAttribute):
             logging.debug("Connection not an OutputAttribute")
             return False
-        from .actions import PublishRenderAction
+        from .actions import RenderAction
         return isinstance(connection.value, RenderAction)
 
 class ComprenderData(Data):
