@@ -10,6 +10,9 @@ from core.attributes import *
 
 
 class NodeLine(QGraphicsPathItem):
+    """
+    Noodle between two nodes.
+    """
     def __init__(self, pointA, pointB):
         super(NodeLine, self).__init__()
         self._pointA = pointA
@@ -31,6 +34,9 @@ class NodeLine(QGraphicsPathItem):
         self.pointB = event.pos()
 
     def updatePath(self):
+        """
+        Recomputes path. Called after points are changed, or nodes have moved.
+        """
         path = QPainterPath()
         path.moveTo(self.pointA)
         dx = self.pointB.x() - self.pointA.x()
@@ -84,6 +90,12 @@ class NodeLine(QGraphicsPathItem):
 
 
 class NodeSocket(QGraphicsItem):
+    """
+    Connection point to or out from a node. 
+    Each socket refers to either an InputAttribute or an OutputAttribute. 
+    Outputs can have any number of outgoing connections, but only Array Inputs
+    can have multiple incoming connections.
+    """
     def __init__(self, rect, parent, attribute):
         super(NodeSocket, self).__init__(parent)
         self.rect = rect
@@ -119,6 +131,11 @@ class NodeSocket(QGraphicsItem):
         painter.drawEllipse(self.rect)
 
     def createNewLine(self, pos=QPointF(0,0)):
+        """
+        Creates a new line that isn't connected to anything yet.
+        This happens when a user drags a noodle out from a Socket,
+        and have not yet assigned it to another socket.
+        """
         if isinstance(self.attribute, OutputAttribute):
             rect = self.boundingRect()
             pointA = QPointF(rect.x() + rect.width()/2, rect.y() + rect.height()/2)
@@ -139,6 +156,10 @@ class NodeSocket(QGraphicsItem):
             logging.error("Unable to create new line. Attribute is not input or output")
  
     def updateNewLine(self, pos):
+        """
+        Updates the positions for the newline.
+        Called mostly as the user drags the noodle across the canvas.
+        """
         point = self.mapToScene(pos)
         if isinstance(self.attribute, OutputAttribute):
             self.newLine.pointB = point
@@ -146,6 +167,11 @@ class NodeSocket(QGraphicsItem):
             self.newLine.pointA = point
 
     def connectToItem(self, item):
+        """
+        Attempts to connect two items to eachother.
+        Checks are made that the two graphical items are compatible (ie, two Sockets),
+        and that the connection is legal on the backend (ie, Nuke nodes and ComprenderActions)
+        """
         logging.debug("Trying to connect to item")
         if isinstance(self.attribute, OutputAttribute) and isinstance(item.attribute, InputAttribute):
             fro = self
@@ -186,6 +212,11 @@ class NodeSocket(QGraphicsItem):
         return True
 
     def removeNewLine(self):
+        """
+        Cleans up the temp line, making sure we don't
+        have any lingering items in the scene, leaking memory
+        or newLine pointers refering to connected LineItems.
+        """
         logging.debug("Removing temp line")
         if self.newLine in self.outLines:
             self.outLines.remove(self.newLine)
@@ -207,8 +238,15 @@ class NodeSocket(QGraphicsItem):
         item = self.scene().itemAt(event.scenePos().toPoint(), QTransform())
         if isinstance(item, NodeSocket):
             self.connectToItem(item)
+        elif item is self.newLine:
+            self.createNodeMenu(event)
         if self.newLine:
             self.removeNewLine()
+
+    def createNodeMenu(self, event):
+        menu = QMenu()
+        make = menu.addAction('Create New Node')
+        selectedAction = menu.exec_(event.screenPos())
 
     def getCenter(self):
         rect = self.boundingRect()
@@ -376,7 +414,8 @@ class SceneNodeItem(NodeItem):
         actionMenu = menu.addMenu("Create Action")
         for action in self.node.knownActions():
             actionMenu.addAction(action)
-        selectedAction = menu.exec_(event.screenPos())
+        selectedAction = menu.exec_(event.globalPos())
+
 
 class ActionNodeItem(NodeItem):
     def __init__(self, node):
@@ -393,7 +432,7 @@ class ActionNodeItem(NodeItem):
     def contextMenuEvent(self, event):
         menu = QMenu()
         make = menu.addAction('Run in tractor')
-        selectedAction = menu.exec_(event.screenPos())
+        selectedAction = menu.exec_(event.globalPos())
 
 
 class DataNodeItem(NodeItem):
@@ -411,6 +450,6 @@ class DataNodeItem(NodeItem):
     def contextMenuEvent(self, event):
         menu = QMenu()
         make = menu.addAction('List versions')
-        selectedAction = menu.exec_(event.screenPos())
+        selectedAction = menu.exec_(event.globalPos())
 
 

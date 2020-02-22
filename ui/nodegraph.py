@@ -31,7 +31,13 @@ class NodeGraphView(QGraphicsView):
         self.setFocusPolicy(Qt.StrongFocus)
 
     def contextMenuEvent(self, event):
-        self.createNodeMenu(event.globalPos())
+        super(QGraphicsView, self).contextMenuEvent(event)
+        pos = self.mapToScene(self.mousePosLocal)
+        itemUnderPointer = self.scene().itemAt(pos, QTransform())
+        if hasattr(itemUnderPointer, "contextMenuEvent"):
+            itemUnderPointer.contextMenuEvent(event)
+        else:
+            self.createNodeMenu(event.globalPos())
 
     def mouseMoveEvent(self, event):
         self.mousePosGlobal = QPoint(event.globalPos())
