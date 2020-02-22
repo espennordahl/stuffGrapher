@@ -98,6 +98,7 @@ class NodeSocket(QGraphicsItem):
     """
     def __init__(self, rect, parent, attribute):
         super(NodeSocket, self).__init__(parent)
+        self.parent = parent
         self.rect = rect
         self.attribute = attribute
 
@@ -239,13 +240,12 @@ class NodeSocket(QGraphicsItem):
         if isinstance(item, NodeSocket):
             self.connectToItem(item)
         elif item is self.newLine:
-            self.createNodeMenu(event)
+            self.showCreateNodeMenu(event)
         if self.newLine:
             self.removeNewLine()
 
-    def createNodeMenu(self, event):
-        menu = QMenu()
-        make = menu.addAction('Create New Node')
+    def showCreateNodeMenu(self, event):
+        menu = self.parent.createNodeMenu(self, event)
         selectedAction = menu.exec_(event.screenPos())
 
     def getCenter(self):
@@ -416,6 +416,10 @@ class SceneNodeItem(NodeItem):
             actionMenu.addAction(action)
         selectedAction = menu.exec_(event.globalPos())
 
+    def createNodeMenu(self, socket, event):
+        menu = QMenu()
+        menu.addAction('I am a scene!') 
+        return menu
 
 class ActionNodeItem(NodeItem):
     def __init__(self, node):
@@ -434,6 +438,10 @@ class ActionNodeItem(NodeItem):
         make = menu.addAction('Run in tractor')
         selectedAction = menu.exec_(event.globalPos())
 
+    def createNodeMenu(self, socket, event):
+        menu = QMenu()
+        menu.addAction('I am an Action!') 
+        return menu
 
 class DataNodeItem(NodeItem):
     def __init__(self, node):
@@ -452,4 +460,8 @@ class DataNodeItem(NodeItem):
         make = menu.addAction('List versions')
         selectedAction = menu.exec_(event.globalPos())
 
+    def createNodeMenu(self, socket, event):
+        menu = QMenu()
+        menu.addAction('I am data!') 
+        return menu
 
