@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 from core import Graph, SceneFile, Action, Data
 from core.attributes import *
 
-
+logger = logging.getLogger(__name__)
 
 class NodeLine(QGraphicsPathItem):
     """
@@ -154,7 +154,7 @@ class NodeSocket(QGraphicsItem):
             self.inLines.append(self.newLine)
             self.scene().addItem(self.newLine)
         else:
-            logging.error("Unable to create new line. Attribute is not input or output")
+            logger.error("Unable to create new line. Attribute is not input or output")
  
     def updateNewLine(self, pos):
         """
@@ -173,7 +173,7 @@ class NodeSocket(QGraphicsItem):
         Checks are made that the two graphical items are compatible (ie, two Sockets),
         and that the connection is legal on the backend (ie, Nuke nodes and ComprenderActions)
         """
-        logging.debug("Trying to connect to item")
+        logger.debug("Trying to connect to item")
         if isinstance(self.attribute, OutputAttribute) and isinstance(item.attribute, InputAttribute):
             fro = self
             to = item
@@ -181,11 +181,11 @@ class NodeSocket(QGraphicsItem):
             fro = item
             to = self
         else:
-            logging.debug("Items not input/output pair")
+            logger.debug("Items not input/output pair")
             return False
 
         if not to.attribute.isLegalConnection(fro.attribute):
-            logging.debug("Illegal connection")
+            logger.debug("Illegal connection")
             return False
         
         if not self.newLine:
@@ -218,7 +218,7 @@ class NodeSocket(QGraphicsItem):
         have any lingering items in the scene, leaking memory
         or newLine pointers refering to connected LineItems.
         """
-        logging.debug("Removing temp line")
+        logger.debug("Removing temp line")
         if self.newLine in self.outLines:
             self.outLines.remove(self.newLine)
         else:
@@ -263,11 +263,6 @@ class NodeItem(QGraphicsItem):
     def __init__(self, node=None):
         super(NodeItem, self).__init__()
         self.node = node
-        if self.node:
-            if not self.node.hasAttribute("pos.x"):
-                self.node.addAttribute(FloatAttribute("pos.x", self.pos().x, hidden=True))
-            if not self.node.hasAttribute("pos.y"):
-                self.node.addAttribute(FloatAttribute("pos.y", self.pos().y, hidden=True))
 
         self.inputs = []
         self.outputs = []
@@ -369,15 +364,15 @@ class NodeItem(QGraphicsItem):
     def itemChange(self, change, value):
         if change == QGraphicsItem.ItemPositionHasChanged:
             if self.node:
-                self.node["pos.x"].value = self.pos().x
-                self.node["pos.y"].value = self.pos().y
+                self.node["pos.x"].value = self.pos().x()
+                self.node["pos.y"].value = self.pos().y()
         return QGraphicsItem.itemChange(self, change, value)
 
     def connectInputs(self):
         for input in self.inputs:
             if not input.attribute.value:
                 continue
-            logging.debug("Creating intput connection")
+            logger.debug("Creating intput connection")
             items = self.scene().items()
             item = None
             for x in items:
@@ -385,7 +380,7 @@ class NodeItem(QGraphicsItem):
                     if x.node == input.attribute.value:
                         item = x
             if not item:
-                logging.error("Couldn't find item by name: " + str(input.attribute.value.name))
+                logger.error("Couldn't find item by name: " + str(input.attribute.value.name))
             ## TODO: We should connect to attributes and not nodes..
             input.connectToItem(item.outputs[0])
 
@@ -398,40 +393,54 @@ class NodeItem(QGraphicsItem):
 class SceneNodeItem(NodeItem):
     def __init__(self, node):
         super(SceneNodeItem, self).__init__(node)
-        logging.debug("Creating SceneNodeItem")
+        logger.debug("Creating SceneNodeItem")
        
         gradient = QLinearGradient(0,0,0,self.rect.height())
         baseCol = self.getBaseColor(0)
         gradient.setColorAt(1,baseCol)
         gradient.setColorAt(0,self.getTopColor(baseCol))
         self.brush = QBrush(gradient)
-        logging.debug("Created SceneNodeItem")
+        logger.debug("Created SceneNodeItem")
 
     def contextMenuEvent(self, event):
         menu = QMenu()
         make = menu.addAction('Create on disk')
         listAction = menu.addAction('List versions')
         actionMenu = menu.addMenu("Create Action")
-        for action in self.node.knownActions():
-            actionMenu.addAction(action)
+        for actionName in self.node.knownActions():
+            action = QAction(actionName, self.scene())
+            action.triggered.connect(
+                    lambda checked, name=actionName: self.createAction(name))
+            actionMenu.addAction(action) 
         selectedAction = menu.exec_(event.globalPos())
 
     def createNodeMenu(self, socket, event):
         menu = QMenu()
-        menu.addAction('I am a scene!') 
+        actionMenu = menu.addMenu("Create Action")
+        for actionName in self.node.knownActions():
+            action = QAction(actionName, self.scene())
+            action.triggered.connect(
+                    lambda checked, name=actionName: self.createAction(name))
+            actionMenu.addAction(action) 
         return menu
+
+    def createAction(self, actionType):
+        logger.debug("Attempting to create action: " + actionType)
+        action = self.node.createAction(actionType, "")
+        action["pos.x"].value = self.node["pos.x"].value + 100
+        action["pos.y"].value = self.node["pos.y"].value
 
 class ActionNodeItem(NodeItem):
     def __init__(self, node):
         super(ActionNodeItem, self).__init__(node)
-        logging.debug("Creating ActionNodeItem")
+        logger.debug("Creating ActionNodeItem")
        
         gradient = QLinearGradient(0,0,0,self.rect.height())
         baseCol = self.getBaseColor(120)
         gradient.setColorAt(1,baseCol)
         gradient.setColorAt(0,self.getTopColor(baseCol))
         self.brush = QBrush(gradient)
-        logging.debug("Created ActionNodeItem")
+        logger.debug("Created ActionNodeItem")
 
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -446,14 +455,14 @@ class ActionNodeItem(NodeItem):
 class DataNodeItem(NodeItem):
     def __init__(self, node):
         super(DataNodeItem, self).__init__(node)
-        logging.debug("Creating DataNodeItem")
+        logger.debug("Creating DataNodeItem")
        
         gradient = QLinearGradient(0,0,0,self.rect.height())
         baseCol = self.getBaseColor(240)
         gradient.setColorAt(1,baseCol)
         gradient.setColorAt(0,self.getTopColor(baseCol))
         self.brush = QBrush(gradient)
-        logging.debug("Created DataNodeItem")
+        logger.debug("Created DataNodeItem")
 
     def contextMenuEvent(self, event):
         menu = QMenu()

@@ -25,7 +25,7 @@ class Action(Node):
         import core.actions
         classname = root["class"]
         if not classname in dir(core.actions):
-            logging.error("Unable to deserialize. Unknown classname: " + classname)
+            logger.error("Unable to deserialize. Unknown classname: " + classname)
 
         cls = getattr(core.actions, classname)
 
@@ -47,7 +47,7 @@ class Action(Node):
 
     def _checkInputConnection(self, connection):
         if not isinstance(connection, OutputAttribute):
-            logging.debug("Connection not an OutputAttribute")
+            logger.debug("Connection not an OutputAttribute")
             return False
         from .scenefile import SceneFile
         return isinstance(connection.value, SceneFile)

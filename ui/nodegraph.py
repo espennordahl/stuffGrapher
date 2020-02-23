@@ -97,26 +97,25 @@ class NodeGraphView(QGraphicsView):
  
 
     def setShot(self, shot):
-        logging.debug("Setting shot: " + shot.name)
+        logger.debug("Setting shot: " + shot.name)
         self.shot = shot
         self.scene().clear()
 
         if not self.shot.graph:
-            logging.debug("No graph for shot yet. Creating one")
+            logger.debug("No graph for shot yet. Creating one")
             self.shot.graph = Graph()
         else:
             graph = self.shot.graph
-            logging.debug("Graph has {num} nodes. Populating.".format(num=len(graph.nodes)))
+            logger.debug("Graph has {num} nodes. Populating.".format(num=len(graph.nodes)))
             items = []
             ## Nodes first
             for node in graph.nodes.values():
                 item = self.itemFromNode(node)
 
                 items.append(item)
-                if node.hasAttribute("pos.x"):
-                    x = node["pos.x"].value()
-                    y = node["pos.y"].value()
-                    item.setPos(x, y)
+                x = node["pos.x"].value
+                y = node["pos.y"].value
+                item.setPos(x, y)
                 self.addNodeItem(item)
 
             ## Then connections

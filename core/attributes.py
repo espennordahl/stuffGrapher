@@ -3,29 +3,44 @@ import copy
 
 import logging
 
+logger = logging.getLogger(__name__)
+
 class Attribute:
     def __init__(self, key, value=None, hidden=False):
         if isinstance(key, str):
             self.key = str(key)
         else:
-            logging.error("Attribute names must be strings. Received: " + type(key))
-        self.value = value
+            logger.error("Attribute names must be strings. Received: " + type(key))
+        self._value = value
         self.hidden = hidden
 
     @classmethod
     def deserialize(self, root):
         classname = root["class"]
         if not classname in dir(sys.modules[__name__]):
-            logging.error("Asked to deserialize unknown class: " + classname)
+            logger.error("Asked to deserialize unknown class: " + classname)
         
         if classname == self.__class__.__name__:
-            logging.error("Asked to serialize Attribute, which is an abstract class")
+            logger.error("Asked to serialize Attribute, which is an abstract class")
 
         cls = getattr(sys.modules[__name__], classname)
         obj = cls.deserialize(root)
         return obj
 
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        logger.debug("{} = {}".format(self.key, value))
+        self._value = value
+
     def setValue(self, value):
+        """
+        This feels like we're doublign up on the setter, but
+        we need a slot to connect to in UI code, sooo..
+        """
         self.value = value
 
     def serialize(self):

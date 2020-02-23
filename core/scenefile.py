@@ -39,10 +39,10 @@ class SceneFile(Node):
 
     def createAction(self, actionname, match):
         if actionname not in self.knownActions():
-            logging.error("Tried to create incompatible or unknown action: " + actionname)
+            logger.error("Tried to create incompatible or unknown action: " + actionname)
 
         if not actionname in dir(core.actions):
-            logging.error("Tried to create non existing action object: " + actionname)
+            logger.error("Tried to create non existing action object: " + actionname)
 
         cls = getattr(core.actions, actionname)
         action = cls(match)
@@ -59,7 +59,7 @@ class SceneFile(Node):
         import core.scenefiles
         classname = root["class"]
         if not classname in dir(core.scenefiles):
-            logging.error("Unable to deserialize. Unknown classname: " + classname)
+            logger.error("Unable to deserialize. Unknown classname: " + classname)
 
         cls = getattr(core.scenefiles, classname)
 
@@ -81,7 +81,7 @@ class SceneFile(Node):
 
     def _checkInputConnection(self, connection):
         if not isinstance(connection, OutputAttribute):
-            logging.debug("Connection not an OutputAttribute")
+            logger.debug("Connection not an OutputAttribute")
             return False
         return isinstance(connection.value, Data)
 

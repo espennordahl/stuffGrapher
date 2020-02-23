@@ -45,7 +45,7 @@ class AttributeEditor(QDockWidget):
         
 
     def _createAttributeWidget(self, attribute):
-        logging.debug("Building UI for attribute: " + attribute.key)
+        logger.debug("Building UI for attribute: " + attribute.key)
         
         layout = QHBoxLayout()
         layout.addWidget(QLabel(attribute.key))

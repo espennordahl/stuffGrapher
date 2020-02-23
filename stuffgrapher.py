@@ -10,6 +10,7 @@ import qdarkstyle
 
 from ui.mainwindow import MainWindow
 
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":    
     parser = argparse.ArgumentParser()
@@ -25,7 +26,8 @@ if __name__ == "__main__":
         action="store_const", dest="loglevel", const=logging.INFO,
     )
     args = parser.parse_args()    
-    logging.basicConfig(level=args.loglevel)
+    logging.basicConfig(level=args.loglevel, format='%(levelname)s : %(name)s.%(funcName)s : %(message)s')
+    logger.debug("Hello, world!")
 
     app = QApplication(sys.argv)
     mainWindow = MainWindow()

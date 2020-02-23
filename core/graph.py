@@ -41,7 +41,7 @@ class Graph:
 
     def renameNode(self, node, newname):
         if node not in self.nodes.values():
-            logging.error("Asked to rename a node not in the graph")
+            logger.error("Asked to rename a node not in the graph")
         self.nodes.pop(node.name)
         newname = self.createUniqueName(newname)
         node._name = newname 
@@ -64,7 +64,7 @@ class Graph:
             module = data
 
         if not module:
-            logging.error("Unable to find Node class: {nm}".format(nm=classname))
+            logger.error("Unable to find Node class: {nm}".format(nm=classname))
 
         cls = getattr(module, classname)
         node = cls(match)
@@ -83,7 +83,7 @@ class Graph:
     def deserialize(cls, root):
         classname = root["class"]
         if classname != "Graph":
-            logging.error("Wrong serializer called. Expected Graph, got " + classname)
+            logger.error("Wrong serializer called. Expected Graph, got " + classname)
 
         graph = Graph()
         for node in root["nodes"]:
@@ -96,7 +96,7 @@ class Graph:
             elif classname in dir(data):
                 module = data
             if not module:
-                logging.error("Unable to find Node class: {nm}".format(nm=classname))
+                logger.error("Unable to find Node class: {nm}".format(nm=classname))
 
             cls = getattr(module, classname)
             obj = cls.deserialize(node)

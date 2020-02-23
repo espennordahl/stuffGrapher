@@ -1,4 +1,5 @@
 import sys
+import logging
 
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -12,6 +13,8 @@ from .nodegraph import *
 
 from core import Shot
 from core import Graph
+
+logger = logging.getLogger(__name__)
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):

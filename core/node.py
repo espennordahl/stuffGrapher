@@ -12,7 +12,10 @@ class Node:
         self.match = match
         self.graph = None
         self._name = self.__class__.__name__
-        self.addAttribute(OutputAttribute("out", self, hidden=True))
+        self.addAttribute(OutputAttribute("out", None, hidden=True))
+        self.addAttribute(FloatAttribute("pos.x", 0, hidden=True))
+        self.addAttribute(FloatAttribute("pos.y", 0, hidden=True))
+
 
     def visualName(self):
         return self.name
@@ -30,7 +33,7 @@ class Node:
 
     def addAttribute(self, attribute):
         if not isinstance(attribute, Attribute):
-            logging.error("addAttribute takes only Attribute objects. Got " + str(type(attribute)))
+            logger.error("addAttribute takes only Attribute objects. Got " + str(type(attribute)))
         if attribute.key in self.attributes:
             logging.warning("Attribute with name {nm} already exists. Ignoring.".format(nm=attribute.key))
             return
@@ -62,7 +65,7 @@ class Node:
     @classmethod
     def deserialize(cls, root):
         if root["class"] != "Node":
-            logging.error("Wrong deserializer called: " + root["class"])
+            logger.error("Wrong deserializer called: " + root["class"])
         obj = Node(root["match"])
 
         attributes = root["attributes"]
