@@ -104,22 +104,32 @@ class NodeGraphView(QGraphicsView):
         if not self.shot.graph:
             logger.debug("No graph for shot yet. Creating one")
             self.shot.graph = Graph()
-        else:
-            graph = self.shot.graph
-            logger.debug("Graph has {num} nodes. Populating.".format(num=len(graph.nodes)))
-            items = []
-            ## Nodes first
-            for node in graph.nodes.values():
-                item = self.itemFromNode(node)
+        self.shot.graph.addGraphChangedCallback(self.graphChanged)
+        self.graphChanged()
 
-                items.append(item)
-                x = node["pos.x"].value
-                y = node["pos.y"].value
-                item.setPos(x, y)
-                self.addNodeItem(item)
+    def graphChanged(self):
+        graph = self.shot.graph
+        logger.debug("Graph has {num} nodes. Populating.".format(num=len(graph.nodes)))
+        items = []
+        ## Nodes first
+        for node in graph.nodes.values():
+            for item in self.scene().items():
+                if hasattr(item, "node"):
+                    if node == item.node:
+                        logger.debug("skipping existing node: {}".format(node.name))
+                        continue
 
-            ## Then connections
-            for item in items:
-                item.connectInputs()
-        
+            logger.debug("Node not in scene. Creating {}".format(node.name))
+            item = self.itemFromNode(node)
+
+            items.append(item)
+            x = node["pos.x"].value
+            y = node["pos.y"].value
+            item.setPos(x, y)
+            self.addNodeItem(item)
+
+        ## Then connections
+        for item in items:
+            item.connectInputs()
+    
         self.scene().update()

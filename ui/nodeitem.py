@@ -174,6 +174,7 @@ class NodeSocket(QGraphicsItem):
         and that the connection is legal on the backend (ie, Nuke nodes and ComprenderActions)
         """
         logger.debug("Trying to connect to item")
+        ## Check that we're actually dealing with an input/output pair
         if isinstance(self.attribute, OutputAttribute) and isinstance(item.attribute, InputAttribute):
             fro = self
             to = item
@@ -184,10 +185,11 @@ class NodeSocket(QGraphicsItem):
             logger.debug("Items not input/output pair")
             return False
 
+        ## Check legality
         if not to.attribute.isLegalConnection(fro.attribute):
             logger.debug("Illegal connection")
             return False
-        
+
         if not self.newLine:
             self.createNewLine()
         self.newLine.pointA = fro.getCenter()
@@ -372,7 +374,7 @@ class NodeItem(QGraphicsItem):
         for input in self.inputs:
             if not input.attribute.value:
                 continue
-            logger.debug("Creating intput connection")
+            logger.debug("Creating input connection")
             items = self.scene().items()
             item = None
             for x in items:
@@ -381,8 +383,20 @@ class NodeItem(QGraphicsItem):
                         item = x
             if not item:
                 logger.error("Couldn't find item by name: " + str(input.attribute.value.name))
+
             ## TODO: We should connect to attributes and not nodes..
-            input.connectToItem(item.outputs[0])
+            ## But this should work as long for single output nodes
+            output = item.outputs[0] 
+
+            exists = False
+            for line in input.inLines:
+                if line.source == output:
+                    exists = True
+
+            if exists:
+                continue
+
+            input.connectToItem(output)
 
     def getBaseColor(self, hue):
         return QColor.fromHsv(hue,120,100)

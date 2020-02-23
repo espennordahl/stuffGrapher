@@ -10,6 +10,16 @@ from core.attributes import *
 class Graph:
     def __init__(self):
         self.nodes = {}
+        self._graphChangedCallbacks = []
+
+    def graphChanged(self):
+        for func in self._graphChangedCallbacks:
+            if callable(func):
+                func()
+
+    def addGraphChangedCallback(self, func):
+        if func not in self._graphChangedCallbacks:
+            self._graphChangedCallbacks.append(func)
 
     def createUniqueName(self, name):
         """
@@ -53,6 +63,7 @@ class Graph:
         self.nodes[node.name] = node
         if node.graph is not self:
             node.setGraph(self)
+        self.graphChanged()
 
     def createNode(self, classname, match):
         module = None
