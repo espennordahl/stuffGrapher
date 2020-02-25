@@ -1,7 +1,5 @@
 - Create Actions from Scenes
 
-- Meaningful inputs/outputs
-
 - Implement shot parents
 
 - Save/Open
@@ -17,3 +15,9 @@
 - Deleting connections
 
 - Selecting connections
+
+- Why have InLines and OutLines..?
+
+- Attributes should have parents
+
+- Why do Sockets have both PointA/B as well as Source/Target..?

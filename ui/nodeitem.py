@@ -385,10 +385,12 @@ class NodeItem(QGraphicsItem):
         super(NodeItem, self).mouseMoveEvent(event)
         for output in self.outputs:
             for line in output.outLines:
+                #TODO: This feels silly..
                 line.pointA = line.source.getCenter()
                 line.pointB = line.target.getCenter()
         for inpt in self.inputs:
             for line in inpt.inLines:
+                #TODO: This feels silly..
                 line.pointA = line.source.getCenter()
                 line.pointB = line.target.getCenter()
 
