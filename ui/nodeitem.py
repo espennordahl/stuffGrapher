@@ -191,7 +191,9 @@ class NodeSocket(QGraphicsItem):
             return False
 
         if not self.newLine:
+            logger.debug("{}: NewLine doesn't exist. Creating".format(self.parent.node.name))
             self.createNewLine()
+
         self.newLine.pointA = fro.getCenter()
         self.newLine.pointB = to.getCenter()
         self.newLine.source = fro
@@ -209,6 +211,7 @@ class NodeSocket(QGraphicsItem):
             fro.outLines.append(self.newLine)
 
         self.newLine.updatePath()
+        logger.debug("Setting newLine to None")
         self.newLine = None
         self.scene().update()
 
@@ -220,7 +223,7 @@ class NodeSocket(QGraphicsItem):
         have any lingering items in the scene, leaking memory
         or newLine pointers refering to connected LineItems.
         """
-        logger.debug("Removing temp line")
+        logger.debug("{}: Removing temp line".format(self.parent.node.name))
         if self.newLine in self.outLines:
             self.outLines.remove(self.newLine)
         else:
@@ -238,6 +241,7 @@ class NodeSocket(QGraphicsItem):
             super(NodeSocket, self).mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
+        logger.debug("Mouse Released")
         item = self.scene().itemAt(event.scenePos().toPoint(), QTransform())
         if isinstance(item, NodeSocket):
             self.connectToItem(item)
@@ -258,8 +262,17 @@ class NodeSocket(QGraphicsItem):
 
     def clearInLines(self):
         for line in self.inLines:
-            self.scene().removeItem(line)
+            if line is not self.newLine:
+                self.scene().removeItem(line)
         self.inLines = []
+
+    def positionChanged(self):
+        for line in self.inLines + self.outLines:
+            ##TODO: This should really not be nessecary..
+            if line.source:
+                line.pointA = line.source.getCenter()
+            if line.target:
+                line.pointB = line.target.getCenter()
 
 class NodeItem(QGraphicsItem):
     def __init__(self, node=None):
@@ -325,13 +338,15 @@ class NodeItem(QGraphicsItem):
         handled as connected attributes, but this way felt
         less intrusive.
         """
-        self.prepareGeometryChange()
         x = self.node["pos.x"].value
         y = self.node["pos.y"].value
         logger.debug("Setting pos: {}.{}".format(str(x),str(y)))
         self.setPos(x, y)
 
         self.connectInputs()
+
+        for socket in self.inputs + self.outputs:
+            socket.positionChanged()
 
     def shape(self):
         path = QPainterPath()
@@ -388,7 +403,7 @@ class NodeItem(QGraphicsItem):
         for input in self.inputs:
             if not input.attribute.value:
                 continue
-            logger.debug("Creating input connection")
+            logger.debug("Creating input connection: {}<--{}".format(self.node.name, input.attribute.value.name))
             items = self.scene().items()
             item = None
             for x in items:
@@ -408,6 +423,7 @@ class NodeItem(QGraphicsItem):
                     exists = True
 
             if exists:
+                logger.debug("Connection exists. Skipping")
                 continue
 
             input.connectToItem(output)
