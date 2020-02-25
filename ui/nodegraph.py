@@ -72,12 +72,12 @@ class NodeGraphView(QGraphicsView):
             return
         
         node = self.shot.graph.createNode(classname, "foo") 
-
-        item = self.itemFromNode(node)
-
-        item.setPos(self.mapToScene(self.mousePosLocal))
-
-        self.addNodeItem(item)
+        pos = self.mapToScene(self.mousePosLocal)
+        node["pos.x"].value = pos.x()
+        node["pos.y"].value = pos.y()
+        ## TODO: Cleaner way of doing this:
+        node.graph.graphChanged()
+        
 
     def addNodeItem(self, node):
         scene = self.scene()
@@ -112,24 +112,23 @@ class NodeGraphView(QGraphicsView):
         logger.debug("Graph has {num} nodes. Populating.".format(num=len(graph.nodes)))
         items = []
         ## Nodes first
-        for node in graph.nodes.values():
-            for item in self.scene().items():
-                if hasattr(item, "node"):
-                    if node == item.node:
-                        logger.debug("skipping existing node: {}".format(node.name))
-                        continue
+        nodesInScene = []
+        for item in self.scene().items():
+            if hasattr(item, "node"):
+                logger.debug("Node already in scene: {}".format(item.node.name))
+                nodesInScene.append(item.node)
+                items.append(item)
 
+        for node in graph.nodes.values():
+            if node in nodesInScene:
+                continue
             logger.debug("Node not in scene. Creating {}".format(node.name))
             item = self.itemFromNode(node)
-
             items.append(item)
-            x = node["pos.x"].value
-            y = node["pos.y"].value
-            item.setPos(x, y)
             self.addNodeItem(item)
 
         ## Then connections
         for item in items:
-            item.connectInputs()
+            item.graphChanged()
     
         self.scene().update()

@@ -63,6 +63,8 @@ class Graph:
         self.nodes[node.name] = node
         if node.graph is not self:
             node.setGraph(self)
+        logger.info("Added node: {}".format(node.name))
+        logger.debug("Node list: {}".format(self.nodes.keys()))
         self.graphChanged()
 
     def createNode(self, classname, match):

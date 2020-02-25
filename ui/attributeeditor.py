@@ -39,10 +39,18 @@ class AttributeEditor(QDockWidget):
         groupLayout = QVBoxLayout()
         groupbox.setLayout(groupLayout)
 
+        ## First non hidden
         for attribute in node.attributes.values():
             if not attribute.hidden:
                 groupLayout.addWidget(self._createAttributeWidget(attribute))
-        
+
+        groupLayout.addWidget(QLabel("Hidden"))
+
+        ## Then hidden tab while debugging
+        for attribute in node.attributes.values():
+            if attribute.hidden:
+                groupLayout.addWidget(self._createAttributeWidget(attribute))
+ 
 
     def _createAttributeWidget(self, attribute):
         logger.debug("Building UI for attribute: " + attribute.key)

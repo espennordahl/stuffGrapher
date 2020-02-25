@@ -319,6 +319,20 @@ class NodeItem(QGraphicsItem):
                                         socketSize), self, attribute)
             self.outputs.append(socket)
 
+    def graphChanged(self):
+        """
+        Called when the graph changed. This might be better
+        handled as connected attributes, but this way felt
+        less intrusive.
+        """
+        self.prepareGeometryChange()
+        x = self.node["pos.x"].value
+        y = self.node["pos.y"].value
+        logger.debug("Setting pos: {}.{}".format(str(x),str(y)))
+        self.setPos(x, y)
+
+        self.connectInputs()
+
     def shape(self):
         path = QPainterPath()
         path.addRect(self.boundingRect())
@@ -441,8 +455,10 @@ class SceneNodeItem(NodeItem):
     def createAction(self, actionType):
         logger.debug("Attempting to create action: " + actionType)
         action = self.node.createAction(actionType, "")
-        action["pos.x"].value = self.node["pos.x"].value + 100
+        action["pos.x"].value = self.node["pos.x"].value + 200
         action["pos.y"].value = self.node["pos.y"].value
+        ## TODO: Cleaner way of doing this:
+        self.node.graph.graphChanged()
 
 class ActionNodeItem(NodeItem):
     def __init__(self, node):
