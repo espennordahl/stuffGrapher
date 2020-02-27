@@ -6,11 +6,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Attribute:
-    def __init__(self, key, value=None, hidden=False):
+    def __init__(self, key, value=None, parent=None, hidden=False):
         if isinstance(key, str):
             self.key = str(key)
         else:
             logger.error("Attribute names must be strings. Received: " + type(key))
+        if isinstance(parent, (bool, str, float, int, list, tuple)):
+            logger.error("Parent can't be of type: {}".format(type(parent)))
+            raise Exception
+        self.parent = parent
         self._value = value
         self.hidden = hidden
 
@@ -28,12 +32,29 @@ class Attribute:
         return obj
 
     @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent):
+        if parent == "None":
+            self._parent = None
+        else:
+            self._parent = parent
+
+    def parentName(self):
+        if self.parent:
+            return self.parent.name
+        else:
+            return "None"
+
+    @property
     def value(self):
         return self._value
 
     @value.setter
     def value(self, value):
-        logger.debug("{} = {}".format(self.key, value))
+        logger.debug("{}.{} = {}".format(self.parentName(), self.key, value))
         self._value = value
 
     def setValue(self, value):
@@ -49,12 +70,15 @@ class Attribute:
         root["key"] = self.key
         root["value"] = str(self.value)
         root["hidden"] = self.hidden
+        root["parent"] = self.parent
         return root
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
         if self.key != other.key:
+            return False
+        if self.parent != other.parent:
             return False
         if self.hidden != other.hidden:
             return False
@@ -66,26 +90,28 @@ class Attribute:
             return self.value == other.value
 
 class BoolAttribute(Attribute):
-    def __init__(self, name, value=None, hidden=False):
-        super(BoolAttribute, self).__init__(name, value, hidden)
+    def __init__(self, key, value=None, parent=None, hidden=False):
+        super(BoolAttribute, self).__init__(key=key, value=value, parent=parent, hidden=hidden)
 
     @classmethod
     def deserialize(self, root):
-        obj = BoolAttribute(root["key"], bool(root["value"]))
+        obj = BoolAttribute(root["key"], 
+                                value=bool(root["value"]), 
+                                hidden=root["hidden"])
         return obj
 
 class ColorAttribute(Attribute):
-    def __init__(self, name, value=None, hidden=False):
-        super(ColorAttribute, self).__init__(name, value, hidden)
+    def __init__(self, key, value=None, parent=None, hidden=False):
+        super(ColorAttribute, self).__init__(key=key, value=value, parent=parent, hidden=hidden)
 
 class EnumAttribute(Attribute):
-    def __init__(self, name, elements=[], value=None, hidden=False):
+    def __init__(self, key, elements=[], value=None, parent=None, hidden=False):
         self.elements = copy.copy(elements)
         if len(self.elements):
             self._value = 0
         else:
             self._value = None
-        super(EnumAttribute, self).__init__(name, value, hidden)
+        super(EnumAttribute, self).__init__(key=key, parent=parent, hidden=hidden)
 
     def addElement(self, element):
         self.elements.append(element)
@@ -119,11 +145,11 @@ class EnumAttribute(Attribute):
 
     @classmethod
     def deserialize(self, root):
-        name = root["key"]
+        key = root["key"]
         elements = root["elements"]
         value = root["value"]
         hidden = root["hidden"]
-        obj = EnumAttribute(name, elements, value, hidden)
+        obj = EnumAttribute(key=key, elements=elements, value=value, hidden=hidden)
         return obj
 
     def serialize(self):
@@ -148,21 +174,30 @@ class EnumAttribute(Attribute):
         return True
 
 class FloatAttribute(Attribute):
-    def __init__(self, name, value=None, hidden=False):
-        super(FloatAttribute, self).__init__(name, value, hidden)
-
-class StringAttribute(Attribute):
-    def __init__(self, name, value=None, hidden=False):
-        super(StringAttribute, self).__init__(name, value, hidden)
+    def __init__(self, name, value=None, parent=None, hidden=False):
+        super(FloatAttribute, self).__init__(name, value, parent, hidden)
 
     @classmethod
     def deserialize(self, root):
-        obj = StringAttribute(root["key"], str(root["value"]))
+        obj = FloatAttribute(root["key"], 
+                                value=root["value"],
+                                hidden=root["hidden"])
+        return obj
+
+class StringAttribute(Attribute):
+    def __init__(self, name, value=None, parent=None, hidden=False):
+        super(StringAttribute, self).__init__(name, value, parent, hidden)
+
+    @classmethod
+    def deserialize(self, root):
+        obj = StringAttribute(root["key"], 
+                                value=str(root["value"]),
+                                hidden=root["hidden"])
         return obj
 
 class InputAttribute(Attribute):
-    def __init__(self, name, value=None, hidden=False):
-        super(InputAttribute, self).__init__(name, value, hidden)
+    def __init__(self, name, value=None, parent=None, hidden=False):
+        super(InputAttribute, self).__init__(name, value, parent, hidden)
         self._connectionCallback = None
 
     @classmethod
@@ -170,9 +205,9 @@ class InputAttribute(Attribute):
         value = root["value"]
         hidden = root["hidden"]
         if value == None:
-            obj = InputAttribute(root["key"], None, hidden)
+            obj = InputAttribute(root["key"], None, hidden=hidden)
         else:
-            obj = InputAttribute(root["key"], str(value), hidden)
+            obj = InputAttribute(root["key"], str(value), hidden=hidden)
         return obj
 
     def serialize(self):
@@ -180,6 +215,7 @@ class InputAttribute(Attribute):
         root["class"] = self.__class__.__name__
         root["key"] = self.key
         root["hidden"] = self.hidden
+        root["parent"] = self.parent
         if self.value:
             root["value"] = str(self.value.name)
         else:
@@ -198,17 +234,17 @@ class InputAttribute(Attribute):
         return True
 
 class ArrayInputAttribute(InputAttribute):
-    def __init__(self, name, value=None, hidden=False):
-        super(ArrayInputAttribute, self).__init__(name, value, hidden)
+    def __init__(self, name, value=None, parent=None, hidden=False):
+        super(ArrayInputAttribute, self).__init__(name, value, parent, hidden)
 
 class OutputAttribute(Attribute):
-    def __init__(self, name, value=None, hidden=False):
-        super(OutputAttribute, self).__init__(name, value, hidden)
+    def __init__(self, name, value=None, parent=None, hidden=False):
+        super(OutputAttribute, self).__init__(name, value, parent, hidden)
 
     @classmethod
     def deserialize(self, root):
         hidden = root["hidden"]
-        obj = OutputAttribute(root["key"], None, hidden)
+        obj = OutputAttribute(root["key"], value=None, hidden=hidden)
         return obj
 
     def serialize(self):
