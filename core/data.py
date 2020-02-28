@@ -27,12 +27,12 @@ class GeoData(Data):
     def __init__(self, match):
        super(GeoData, self).__init__(match)
 
-    def _checkInputConnection(self, connection):
-        if not isinstance(connection, OutputAttribute):
-            logging.debug("Connection not an OutputAttribute")
-            return False
-        from .actions import PublishGeoAction
-        return isinstance(connection.value, PublishGeoAction)
+#    def _checkInputConnection(self, connection):
+#        if not isinstance(connection, OutputAttribute):
+#            logging.debug("Connection not an OutputAttribute")
+#            return False
+#        from .actions import PublishGeoAction
+#        return isinstance(connection.value, PublishGeoAction)
 
 
 class GeocacheData(Data):
@@ -44,8 +44,8 @@ class GeocacheData(Data):
         if not isinstance(connection, OutputAttribute):
             logging.debug("Connection not an OutputAttribute")
             return False
-        from .actions import PublishGeoCacheAction
-        return isinstance(connection.value, PublishGeoCacheAction)
+        from .actions import PublishGeocacheAction
+        return isinstance(connection.value, PublishGeocacheAction)
 
 
 class LookdevData(Data):
@@ -68,7 +68,7 @@ class PlateData(Data):
             logging.debug("Connection not an OutputAttribute")
             return False
         from .actions import PublishPlateAction
-        return isinstance(connection.value, RenderPlateAction)
+        return isinstance(connection.value, PuclishPlateAction)
 
 class RenderData(Data):
     def __init__(self, match):
@@ -89,7 +89,7 @@ class ComprenderData(Data):
         if not isinstance(connection, OutputAttribute):
             logging.debug("Connection not an OutputAttribute")
             return False
-        from .actions import PublishGeoAction
+        from .actions import ComprenderAction
         return isinstance(connection.value, ComprenderAction)
 
 

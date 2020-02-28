@@ -5,3 +5,5 @@ class PublishGeocacheAction(Action):
     def __init__(self, match):
         super(PublishGeocacheAction, self).__init__(match)
 
+    def knownData(self):
+        return ["GeocacheData"]

@@ -27,12 +27,6 @@ class NodeLine(QGraphicsPathItem):
         self.pen.setColor(QColor(200,200,200,255))
         self.setPen(self.pen)
 
-    def mousePressEvent(self, event):
-        self.pointB = event.pos()
-
-    def mouseMoveEvent(self, event):
-        self.pointB = event.pos()
-
     def updatePath(self):
         """
         Recomputes path. Called after points are changed, or nodes have moved.
@@ -492,13 +486,34 @@ class ActionNodeItem(NodeItem):
 
     def contextMenuEvent(self, event):
         menu = QMenu()
-        make = menu.addAction('Run in tractor')
+        menu.addAction('Run in Tractor')
+        dataMenu = menu.addMenu("Create Data")
+        for dataName in self.node.knownData():
+            action = QAction(dataName, self.scene())
+            action.triggered.connect(
+                    lambda checked, name=dataName: self.createData(name))
+            dataMenu.addAction(action) 
         selectedAction = menu.exec_(event.globalPos())
 
     def createNodeMenu(self, socket, event):
         menu = QMenu()
-        menu.addAction('I am an Action!') 
+        dataMenu = menu.addMenu("Create Data")
+        for dataName in self.node.knownData():
+            action = QAction(dataName, self.scene())
+            action.triggered.connect(
+                    lambda checked, name=dataName: self.createData(name))
+            dataMenu.addAction(action) 
         return menu
+
+
+    def createData(self, datatype):
+        logger.debug("Attempting to create data")
+        node = self.node.createData(datatype)
+        node["pos.x"].value = self.node["pos.x"].value + 200
+        node["pos.y"].value = self.node["pos.y"].value
+        ## TODO: Cleaner way of doing this:
+        self.node.graph.graphChanged()
+
 
 class DataNodeItem(NodeItem):
     def __init__(self, node):

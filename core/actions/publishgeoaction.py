@@ -5,3 +5,5 @@ class PublishGeoAction(Action):
     def __init__(self, match):
         super(PublishGeoAction, self).__init__(match)
 
+    def knownData(self):
+        return ["GeoData"]
