@@ -226,9 +226,11 @@ class InputAttribute(Attribute):
         self._connectionCallback = callback
 
     def isLegalConnection(self, connection):
+        logger.debug("Checking connection legality")
         if not isinstance(connection, OutputAttribute):
             return False
-        if self._connectionCallback:
+        logger.debug("Connection callback: {}".format(self._connectionCallback))
+        if callable(self._connectionCallback):
             return self._connectionCallback(connection)
         ## Default to all connections being legal
         return True

@@ -1,6 +1,7 @@
 import logging
 
 from .node import Node
+from core import data
 from .attributes import *
 
 class Action(Node):
@@ -8,7 +9,7 @@ class Action(Node):
         super(Action, self).__init__(match)
         inputAttr = InputAttribute("scenefile", None, hidden=True)
         inputAttr.setConnectionCallback(self._checkInputConnection)
-        self.addAttribute(InputAttribute("scenefile", None, hidden=True))
+        self.addAttribute(inputAttr)
         self.addAttribute(StringAttribute("subpart", "default"))
 
     def visualName(self):
@@ -19,6 +20,9 @@ class Action(Node):
                             )
         else:
             return self.name
+
+    def knownData(self):
+        return []
 
     @classmethod
     def deserialize(cls, root):
@@ -46,9 +50,29 @@ class Action(Node):
         return obj
 
     def _checkInputConnection(self, connection):
+        print("waaaat")
+        return False
         if not isinstance(connection, OutputAttribute):
             logger.debug("Connection not an OutputAttribute")
             return False
         from .scenefile import SceneFile
         return isinstance(connection.value, SceneFile)
+
+    def createData(self, dataType):
+        if dataType not in self.knownData():
+            logger.error("Tried to create incompatible or unknown data: " + dataType)
+
+        if not dataType in dir(data):
+            logger.error("Tried to create non existing data type: " + dataType)
+
+        cls = getattr(data, dataType)
+        node = cls(self.match)
+
+        node["action"].value = self
+
+        if self.graph:
+            self.graph.addNode(node)
+
+        return node
+
 
