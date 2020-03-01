@@ -50,11 +50,11 @@ class TestCreate(unittest.TestCase):
         graph = Graph()
         scenefile = graph.createNode("MayaFile", "lighting")
         action = scenefile.createAction("RenderAction", "dragon")
-        data = action.createRenderLayer("dragon")
+        data = action.createData("RenderData")
 
         self.assertEqual(scenefile.name, "MayaFile")
         self.assertEqual(action.name, "RenderAction")
-        self.assertEqual(data.name, "RenderLayer")
+        self.assertEqual(data.name, "RenderData")
 
     def foo(self):
         self.assertEqual(1, 2)

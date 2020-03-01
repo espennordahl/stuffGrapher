@@ -13,7 +13,7 @@ class HoudiniFile(SceneFile):
         self.attributes["template"].value = "FXTemplate"
 
         ## Default department
-        self.attributes["department"].value = "fx"
+        self["department"] = "fx"
 
     def knownActions(self):
         return [

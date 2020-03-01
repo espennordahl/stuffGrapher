@@ -40,18 +40,15 @@ class Action(Node):
         attributes = root["attributes"]
         for attrname in attributes:
             attribute = Attribute.deserialize(attributes[attrname])
-            if isinstance(attribute, OutputAttribute):
-                attribute.value = obj
+            attribute.parent = obj
             if attrname in obj.attributes:
-                obj[attrname] = attribute
+                obj.attributes[attrname] = attribute
             else:
                 obj.addAttribute(attribute)
 
         return obj
 
     def _checkInputConnection(self, connection):
-        print("waaaat")
-        return False
         if not isinstance(connection, OutputAttribute):
             logger.debug("Connection not an OutputAttribute")
             return False
@@ -68,7 +65,7 @@ class Action(Node):
         cls = getattr(data, dataType)
         node = cls(self.match)
 
-        node["action"].value = self
+        node["action"] = self
 
         if self.graph:
             self.graph.addNode(node)

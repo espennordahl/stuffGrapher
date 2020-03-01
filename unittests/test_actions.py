@@ -35,4 +35,18 @@ class TestActions(unittest.TestCase):
         for obj1 in self.createActions():
             json1 = obj1.serialize()
             obj2 = Action.deserialize(json1)
+            for attribute in obj1.attributes:
+                a = obj1[attribute]
+                b = obj2[attribute]
+                if a != b:
+                    print(a)
+                    print(b)
+                    if a.key != b.key:
+                        print("Not matching: {} vs {}".format(a.key, b.key))
+                    if a.value != b.value:
+                        print("Not matching: {} vs {}".format(a.value, b.value))
+                        print("Not matching: {} vs {}".format(type(a.value), type(b.value)))
+                    if a.parentName() != b.parentName():
+                        print("Not matching: {} vs {}".format(a.parentName(), b.parentName()))
+                self.assertEqual(obj1[attribute], obj2[attribute])
             self.assertEqual(obj1, obj2)

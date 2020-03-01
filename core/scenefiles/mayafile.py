@@ -13,7 +13,7 @@ class MayaFile(SceneFile):
         self.attributes["template"].addElement("LightingTemplate")
 
         # Default department
-        self.attributes["department"].value = "lit"
+        self["department"] = "lit"
 
     def knownActions(self):
         return [

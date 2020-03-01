@@ -14,11 +14,11 @@ class NukeFile(SceneFile):
         self.attributes["template"].value = "CompTemplate"
 
         ## Default department
-        self.attributes["department"].value = "comp"
+        self["department"] = "comp"
 
 
         ## Default partname
-        self.attributes["partname"].value = "master"
+        self["partname"] = "master"
 
     def knownActions(self):
         return [

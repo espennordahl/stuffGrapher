@@ -23,4 +23,6 @@ class Tests(unittest.TestCase):
         obj1.addAttribute(StringAttribute("foo", "bar"))
         json1 = obj1.serialize()
         obj2 = Node.deserialize(json1)
+        for attribute in obj1.attributes:
+            self.assertEqual(obj1[attribute], obj2[attribute])
         self.assertEqual(obj1, obj2)

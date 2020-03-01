@@ -37,6 +37,7 @@ class Node:
         if attribute.key in self.attributes:
             logging.warning("Attribute with name {nm} already exists. Ignoring.".format(nm=attribute.key))
             return
+        attribute.parent = self
         self.attributes[attribute.key] = attribute
 
     def hasAttribute(self, attributename):
@@ -46,7 +47,6 @@ class Node:
         self.graph = graph
         if self not in graph.nodes.values():
             self.graph.addNode(self)
-
 
     def inputs(self):
         attrs = []
@@ -71,10 +71,9 @@ class Node:
         attributes = root["attributes"]
         for attrname in attributes:
             attribute = Attribute.deserialize(attributes[attrname])
-            if isinstance(attribute, OutputAttribute):
-                attribute.value = obj
+            attribute.parent = obj
             if attrname in obj.attributes:
-                obj[attrname] = attribute
+                obj.attributes[attrname] = attribute
             else:
                 obj.addAttribute(attribute)
 
@@ -102,4 +101,4 @@ class Node:
         return self.attributes[key]
 
     def __setitem__(self, key, value):
-        self.attributes[key] = value
+        self.attributes[key].value = value

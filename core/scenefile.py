@@ -47,7 +47,7 @@ class SceneFile(Node):
         cls = getattr(core.actions, actionname)
         action = cls(match)
 
-        action["scenefile"].value = self
+        action["scenefile"] = self
 
         if self.graph:
             self.graph.addNode(action)
@@ -70,10 +70,9 @@ class SceneFile(Node):
         attributes = root["attributes"]
         for attrname in attributes:
             attribute = Attribute.deserialize(attributes[attrname])
-            if isinstance(attribute, OutputAttribute):
-                attribute.value = obj
+            attribute.parent = obj
             if attrname in obj.attributes:
-                obj[attrname] = attribute
+                obj.attributes[attrname] = attribute
             else:
                 obj.addAttribute(attribute)
 

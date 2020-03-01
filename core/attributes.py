@@ -15,7 +15,7 @@ class Attribute:
             logger.error("Parent can't be of type: {}".format(type(parent)))
             raise Exception
         self.parent = parent
-        self._value = value
+        self.value = value
         self.hidden = hidden
 
     @classmethod
@@ -68,7 +68,7 @@ class Attribute:
         root = {}
         root["class"] = self.__class__.__name__
         root["key"] = self.key
-        root["value"] = str(self.value)
+        root["value"] = self.value
         root["hidden"] = self.hidden
         root["parent"] = self.parent
         return root
@@ -78,7 +78,7 @@ class Attribute:
             return False
         if self.key != other.key:
             return False
-        if self.parent != other.parent:
+        if self.parentName() != other.parentName():
             return False
         if self.hidden != other.hidden:
             return False
@@ -88,6 +88,12 @@ class Attribute:
             return self.value.name == other.value.name
         else:
             return self.value == other.value
+
+    def __repr__(self):
+        if isinstance(self.value, Attribute):
+            return "Parent:{} Key:{} Value:{}".format(self.parentName(), self.key, str(self.value.key))
+        else:
+            return "Parent:{} Key:{} Value:{}".format(self.parentName(), self.key, str(self.value))
 
 class BoolAttribute(Attribute):
     def __init__(self, key, value=None, parent=None, hidden=False):
@@ -99,6 +105,19 @@ class BoolAttribute(Attribute):
                                 value=bool(root["value"]), 
                                 hidden=root["hidden"])
         return obj
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        if not isinstance(value, bool):
+            logger.error("Expected Bool, got {}".format(type(value)))
+            raise Exception
+            return
+        logger.debug("{}.{} = {}".format(self.parentName(), self.key, value))
+        self._value = value
 
 class ColorAttribute(Attribute):
     def __init__(self, key, value=None, parent=None, hidden=False):
@@ -127,6 +146,9 @@ class EnumAttribute(Attribute):
             return self.elements[self._value]
         else:
             return False
+    @property
+    def value(self):
+        return self._value
 
     @value.setter
     def value(self, value):
@@ -135,13 +157,16 @@ class EnumAttribute(Attribute):
         elif isinstance(value, int): 
             if value >= len(self.elements):
                 logging.warning("Enum index out of range")
+                return
             else:
                 self._value = value
         else:
             if value not in self.elements:
                 logging.warning("Enum value must be in elements")
+                return
             else:
                 self._value = self.elements.index(value)
+        logger.debug("{}.{} = {}".format(self.parentName(), self.key, value))
 
     @classmethod
     def deserialize(self, root):
@@ -150,6 +175,7 @@ class EnumAttribute(Attribute):
         value = root["value"]
         hidden = root["hidden"]
         obj = EnumAttribute(key=key, elements=elements, value=value, hidden=hidden)
+        obj.value = value
         return obj
 
     def serialize(self):
@@ -184,6 +210,20 @@ class FloatAttribute(Attribute):
                                 hidden=root["hidden"])
         return obj
 
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        if not isinstance(value, (float, int)):
+            logger.error("Expected number, got {}".format(type(value)))
+            raise Exception
+            return
+        logger.debug("{}.{} = {}".format(self.parentName(), self.key, value))
+        self._value = value
+
+
 class StringAttribute(Attribute):
     def __init__(self, name, value=None, parent=None, hidden=False):
         super(StringAttribute, self).__init__(name, value, parent, hidden)
@@ -194,6 +234,20 @@ class StringAttribute(Attribute):
                                 value=str(root["value"]),
                                 hidden=root["hidden"])
         return obj
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        if not isinstance(value, str):
+            logger.error("Expected String, got {}".format(type(value)))
+            raise Exception
+            return
+        logger.debug("{}.{} = {}".format(self.parentName(), self.key, value))
+        self._value = value
+
 
 class InputAttribute(Attribute):
     def __init__(self, name, value=None, parent=None, hidden=False):
@@ -235,18 +289,34 @@ class InputAttribute(Attribute):
         ## Default to all connections being legal
         return True
 
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        from core import Node
+        if not isinstance(value, (Node, str, type(None))):
+            logger.error("Expected Node, string or None, got {}".format(type(value)))
+            raise Exception
+            return
+        logger.debug("{}.{} = {}".format(self.parentName(), self.key, value))
+        self._value = value
+
+
 class ArrayInputAttribute(InputAttribute):
-    def __init__(self, name, value=None, parent=None, hidden=False):
-        super(ArrayInputAttribute, self).__init__(name, value, parent, hidden)
+    def __init__(self, key, value=None, parent=None, hidden=False):
+        super(ArrayInputAttribute, self).__init__(key=key, value=value, parent=parent, hidden=hidden)
 
 class OutputAttribute(Attribute):
-    def __init__(self, name, value=None, parent=None, hidden=False):
-        super(OutputAttribute, self).__init__(name, value, parent, hidden)
+    def __init__(self, key, value=None, parent=None, hidden=False):
+        super(OutputAttribute, self).__init__(key=key, value=value, parent=parent, hidden=hidden)
 
     @classmethod
     def deserialize(self, root):
         hidden = root["hidden"]
-        obj = OutputAttribute(root["key"], value=None, hidden=hidden)
+        value = root["value"]
+        obj = OutputAttribute(root["key"], value=value, hidden=hidden)
         return obj
 
     def serialize(self):
@@ -259,3 +329,19 @@ class OutputAttribute(Attribute):
         else:
             root["value"] = None
         return root
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        from core import Node
+        if not isinstance(value, (Node, str, type(None))):
+            logger.error("Expected Node, string or None, got {}".format(type(value)))
+            raise Exception
+            return
+        logger.debug("{}.{} = {}".format(self.parentName(), self.key, value))
+        self._value = value
+
+
