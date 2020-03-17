@@ -197,8 +197,8 @@ class EnumAttribute(Attribute):
         return True
 
 class FloatAttribute(Attribute):
-    def __init__(self, name, value=None, parent=None, hidden=False):
-        super(FloatAttribute, self).__init__(name, value, parent, hidden)
+    def __init__(self, key, value=None, parent=None, hidden=False):
+        super(FloatAttribute, self).__init__(key, value, parent, hidden)
 
     @classmethod
     def deserialize(self, root):
@@ -222,8 +222,8 @@ class FloatAttribute(Attribute):
 
 
 class StringAttribute(Attribute):
-    def __init__(self, name, value=None, parent=None, hidden=False):
-        super(StringAttribute, self).__init__(name, value, parent, hidden)
+    def __init__(self, key, value=None, parent=None, hidden=False):
+        super(StringAttribute, self).__init__(key, value, parent, hidden)
 
     @classmethod
     def deserialize(self, root):
@@ -247,8 +247,8 @@ class StringAttribute(Attribute):
 
 
 class InputAttribute(Attribute):
-    def __init__(self, name, value=None, parent=None, hidden=False):
-        super(InputAttribute, self).__init__(name, value, parent, hidden)
+    def __init__(self, key, value=None, parent=None, hidden=False):
+        super(InputAttribute, self).__init__(key, value, parent, hidden)
         self._connectionCallback = None
 
     @classmethod
@@ -278,13 +278,25 @@ class InputAttribute(Attribute):
 
     def isLegalConnection(self, connection):
         logger.debug("Checking connection legality")
+        
         if not isinstance(connection, OutputAttribute):
+            logger.debug("Can only connect OutputAttributes.")
             return False
+        
+        if connection.isUpstream(self.parent):
+            logger.debug("Connection would cause a loop.")
+            return False
+
         logger.debug("Connection callback: {}".format(self._connectionCallback))
         if callable(self._connectionCallback):
             return self._connectionCallback(connection)
         ## Default to all connections being legal
         return True
+
+    def isUpstream(self, node):
+        if self.value:
+            return self.value.isUpstream(node)
+        return False
 
     @property
     def value(self):
@@ -304,6 +316,40 @@ class InputAttribute(Attribute):
 class ArrayInputAttribute(InputAttribute):
     def __init__(self, key, value=None, parent=None, hidden=False):
         super(ArrayInputAttribute, self).__init__(key=key, value=value, parent=parent, hidden=hidden)
+
+    def append(self, value):
+        self.elements.append(value)
+
+    @classmethod
+    def deserialize(self, root):
+        obj = ArrayInputAttribute(root["key"], 
+                                    value=root["value"],
+                                    hidden=root["hidden"])
+        return obj
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        if not isinstance(value, (tuple, list, type(None))):
+            logger.error("Expected list or None, got {}".format(type(value)))
+            raise Exception
+            return
+        logger.debug("{}.{} = {}".format(self.parentName(), self.key, value))
+        self._value = []
+        if value:
+            for element in value:
+                self._value.append(element)
+
+    def isUpstream(self, node):
+        if self.value:
+            for connection in self.value:
+                if connection.isUpstream(node):
+                    return True
+        return False
+
 
 class OutputAttribute(Attribute):
     def __init__(self, key, value=None, parent=None, hidden=False):
@@ -341,4 +387,6 @@ class OutputAttribute(Attribute):
         logger.debug("{}.{} = {}".format(self.parentName(), self.key, value))
         self._value = value
 
+    def isUpstream(self, node):
+        return self.parent.isUpstream(node)
 

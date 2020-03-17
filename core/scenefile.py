@@ -21,7 +21,7 @@ departments = [
 class SceneFile(Node):
     def __init__(self, match):
         super(SceneFile, self).__init__(match)
-        inputAttr = InputAttribute("input", hidden=True)
+        inputAttr = ArrayInputAttribute("input", hidden=True)
         inputAttr.setConnectionCallback(self._checkInputConnection)
         self.addAttribute(inputAttr)
         self.addAttribute(EnumAttribute("department", elements=departments))
@@ -82,5 +82,5 @@ class SceneFile(Node):
         if not isinstance(connection, OutputAttribute):
             logger.debug("Connection not an OutputAttribute")
             return False
-        return isinstance(connection.value, Data)
+        return isinstance(connection.parent, Data)
 

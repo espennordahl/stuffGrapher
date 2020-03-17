@@ -62,6 +62,14 @@ class Node:
                 attrs.append(attribute)
         return attrs
 
+    def isUpstream(self, node):
+        if node == self:
+            return True
+        for connection in self.inputs():
+            if connection.isUpstream(node):
+                return True
+        return False
+
     @classmethod
     def deserialize(cls, root):
         if root["class"] != "Node":

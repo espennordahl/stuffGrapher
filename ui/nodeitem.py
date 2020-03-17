@@ -399,30 +399,36 @@ class NodeItem(QGraphicsItem):
         for input in self.inputs:
             if not input.attribute.value:
                 continue
-            logger.debug("Creating input connection: {}<--{}".format(self.node.name, input.attribute.value.name))
-            items = self.scene().items()
-            item = None
-            for x in items:
-                if isinstance(x, NodeItem):
-                    if x.node == input.attribute.value:
-                        item = x
-            if not item:
-                logger.error("Couldn't find item by name: " + str(input.attribute.value.name))
+            if isinstance(input.attribute, ArrayInputAttribute):
+                inputNodes = input.attribute.value
+            else:
+                inputNodes = [input.attribute.value]
 
-            ## TODO: We should connect to attributes and not nodes..
-            ## But this should work as long for single output nodes
-            output = item.outputs[0] 
+            for inputNode in inputNodes:
+                logger.debug("Creating input connection: {}<--{}".format(self.node.name, inputNode.name))
+                items = self.scene().items()
+                item = None
+                for x in items:
+                    if isinstance(x, NodeItem):
+                        if x.node == inputNode:
+                            item = x
+                if not item:
+                    logger.error("Couldn't find item by name: " + str(inputNode.name))
 
-            exists = False
-            for line in input.inLines:
-                if line.source == output:
-                    exists = True
+                ## TODO: We should connect to attributes and not nodes..
+                ## But this should work as long for single output nodes
+                output = item.outputs[0] 
 
-            if exists:
-                logger.debug("Connection exists. Skipping")
-                continue
+                exists = False
+                for line in input.inLines:
+                    if line.source == output:
+                        exists = True
 
-            input.connectToItem(output)
+                if exists:
+                    logger.debug("Connection exists. Skipping")
+                    continue
+
+                input.connectToItem(output)
 
     def getBaseColor(self, hue):
         return QColor.fromHsv(hue,120,100)
