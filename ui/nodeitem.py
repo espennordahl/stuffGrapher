@@ -436,6 +436,15 @@ class NodeItem(QGraphicsItem):
     def getTopColor(self, color):
         return color.lighter(150)
 
+    def getOutputNodePos(self):
+        pos = QPointF(self.node["pos.x"].value, self.node["pos.y"].value)
+        pos.setX(pos.x() + 200)
+
+        while self.scene().itemAt(pos, QTransform()):
+            pos.setY(pos.y() + 100)
+ 
+        return pos
+
 class SceneNodeItem(NodeItem):
     def __init__(self, node):
         super(SceneNodeItem, self).__init__(node)
@@ -473,9 +482,9 @@ class SceneNodeItem(NodeItem):
     def createAction(self, actionType):
         logger.debug("Attempting to create action: " + actionType)
         action = self.node.createAction(actionType, "")
-        action["pos.x"] = self.node["pos.x"].value + 200
-        action["pos.y"] = self.node["pos.y"].value
-        ## TODO: Cleaner way of doing this:
+        pos = self.getOutputNodePos()
+        action["pos.x"] = pos.x()
+        action["pos.y"] = pos.y()
         self.node.graph.graphChanged()
 
 class ActionNodeItem(NodeItem):
@@ -515,9 +524,9 @@ class ActionNodeItem(NodeItem):
     def createData(self, datatype):
         logger.debug("Attempting to create data")
         node = self.node.createData(datatype)
-        node["pos.x"] = self.node["pos.x"].value + 200
-        node["pos.y"] = self.node["pos.y"].value
-        ## TODO: Cleaner way of doing this:
+        pos = self.getOutputNodePos()
+        node["pos.x"] = pos.x()
+        node["pos.y"] = pos.y()
         self.node.graph.graphChanged()
 
 
