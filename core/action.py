@@ -53,7 +53,7 @@ class Action(Node):
             logger.debug("Connection not an OutputAttribute")
             return False
         from .scenefile import SceneFile
-        return isinstance(connection.value, SceneFile)
+        return isinstance(connection.parent, SceneFile)
 
     def createData(self, dataType):
         if dataType not in self.knownData():

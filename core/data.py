@@ -27,12 +27,12 @@ class GeoData(Data):
     def __init__(self, match):
        super(GeoData, self).__init__(match)
 
-#    def _checkInputConnection(self, connection):
-#        if not isinstance(connection, OutputAttribute):
-#            logging.debug("Connection not an OutputAttribute")
-#            return False
-#        from .actions import PublishGeoAction
-#        return isinstance(connection.value, PublishGeoAction)
+    def _checkInputConnection(self, connection):
+        if not isinstance(connection, OutputAttribute):
+            logging.debug("Connection not an OutputAttribute")
+            return False
+        from .actions import PublishGeoAction
+        return isinstance(connection.parent, PublishGeoAction)
 
 
 class GeocacheData(Data):
@@ -45,7 +45,7 @@ class GeocacheData(Data):
             logging.debug("Connection not an OutputAttribute")
             return False
         from .actions import PublishGeocacheAction
-        return isinstance(connection.value, PublishGeocacheAction)
+        return isinstance(connection.parent, PublishGeocacheAction)
 
 
 class LookdevData(Data):
@@ -57,7 +57,7 @@ class LookdevData(Data):
             logging.debug("Connection not an OutputAttribute")
             return False
         from .actions import PublishLookdevAction
-        return isinstance(connection.value, PublishLookdevAction)
+        return isinstance(connection.parent, PublishLookdevAction)
 
 class PlateData(Data):
     def __init__(self, match):
@@ -68,7 +68,7 @@ class PlateData(Data):
             logging.debug("Connection not an OutputAttribute")
             return False
         from .actions import PublishPlateAction
-        return isinstance(connection.value, PuclishPlateAction)
+        return isinstance(connection.parent, PuclishPlateAction)
 
 class RenderData(Data):
     def __init__(self, match):
@@ -79,7 +79,7 @@ class RenderData(Data):
             logging.debug("Connection not an OutputAttribute")
             return False
         from .actions import RenderAction
-        return isinstance(connection.value, RenderAction)
+        return isinstance(connection.parent, RenderAction)
 
 class ComprenderData(Data):
     def __init__(self, match):
@@ -90,6 +90,6 @@ class ComprenderData(Data):
             logging.debug("Connection not an OutputAttribute")
             return False
         from .actions import ComprenderAction
-        return isinstance(connection.value, ComprenderAction)
+        return isinstance(connection.parent, ComprenderAction)
 
 
