@@ -68,7 +68,7 @@ class AttributeEditor(QDockWidget):
         elif isinstance(attribute, EnumAttribute):
             valueWidget = QComboBox()
             valueWidget.addItems(attribute.elements)
-            valueWidget.setCurrentText(attribute.value)
+            valueWidget.setCurrentText(str(attribute.value))
             valueWidget.currentTextChanged.connect(attribute.setValue)
             valueWidget.currentTextChanged.connect(self.attributeChanged)
             layout.addWidget(valueWidget)

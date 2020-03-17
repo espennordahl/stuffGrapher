@@ -146,9 +146,6 @@ class EnumAttribute(Attribute):
             return self.elements[self._value]
         else:
             return False
-    @property
-    def value(self):
-        return self._value
 
     @value.setter
     def value(self, value):

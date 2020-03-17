@@ -391,8 +391,8 @@ class NodeItem(QGraphicsItem):
     def itemChange(self, change, value):
         if change == QGraphicsItem.ItemPositionHasChanged:
             if self.node:
-                self.node["pos.x"].value = self.pos().x()
-                self.node["pos.y"].value = self.pos().y()
+                self.node["pos.x"] = self.pos().x()
+                self.node["pos.y"] = self.pos().y()
         return QGraphicsItem.itemChange(self, change, value)
 
     def connectInputs(self):
@@ -467,8 +467,8 @@ class SceneNodeItem(NodeItem):
     def createAction(self, actionType):
         logger.debug("Attempting to create action: " + actionType)
         action = self.node.createAction(actionType, "")
-        action["pos.x"].value = self.node["pos.x"].value + 200
-        action["pos.y"].value = self.node["pos.y"].value
+        action["pos.x"] = self.node["pos.x"].value + 200
+        action["pos.y"] = self.node["pos.y"].value
         ## TODO: Cleaner way of doing this:
         self.node.graph.graphChanged()
 
@@ -509,8 +509,8 @@ class ActionNodeItem(NodeItem):
     def createData(self, datatype):
         logger.debug("Attempting to create data")
         node = self.node.createData(datatype)
-        node["pos.x"].value = self.node["pos.x"].value + 200
-        node["pos.y"].value = self.node["pos.y"].value
+        node["pos.x"] = self.node["pos.x"].value + 200
+        node["pos.y"] = self.node["pos.y"].value
         ## TODO: Cleaner way of doing this:
         self.node.graph.graphChanged()
 

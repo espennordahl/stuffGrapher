@@ -24,14 +24,14 @@ class SceneFile(Node):
         inputAttr = InputAttribute("input", hidden=True)
         inputAttr.setConnectionCallback(self._checkInputConnection)
         self.addAttribute(inputAttr)
-        self.addAttribute(EnumAttribute("department", departments))
+        self.addAttribute(EnumAttribute("department", elements=departments))
         self.addAttribute(StringAttribute("partname", "main"))
         self.addAttribute(EnumAttribute("template"))
 
     def visualName(self):
         return "{department}_{partname}".format(
-                department=self.attributes["department"].value, 
-                partname=self.attributes["partname"].value
+                department=self["department"].value, 
+                partname=self["partname"].value
                 )
 
     def knownActions(self):
