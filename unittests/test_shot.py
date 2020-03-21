@@ -41,7 +41,7 @@ class TestShot(unittest.TestCase):
 
         for shotname in ["fx010", "fx020", "fx030"]:
             shot = Shot(shotname)
-            shot.parent = parent.name
+            shot.parent = parent
             shots.append(shot)
 
         for shotname in ["ab010", "ab020", "ab030", "ab040", "ab050"]:

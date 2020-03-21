@@ -76,12 +76,14 @@ class MainWindow(QMainWindow):
         saveAction = QAction("Save", self)
         saveAction.setShortcut("Ctrl+s")
         saveAction.setStatusTip("Save File")
+        saveAction.triggered.connect(self.save)
         self.fileMenu.addAction(saveAction)
 
         ## Save As
         saveAsAction = QAction("Save As", self)
         saveAsAction.setShortcut("Ctrl+S")
         saveAsAction.setStatusTip("Save File As")
+        saveAsAction.triggered.connect(self.saveas)
         self.fileMenu.addAction(saveAsAction)
 
         ## Exit
@@ -228,4 +230,7 @@ class MainWindow(QMainWindow):
         self.graphLabel.setText(labelText)
         self.nodeGraph.setShot(self.shotBrowser.shots[shotname])
 
+    def save(self):
+        
 
+    def saveas(self):

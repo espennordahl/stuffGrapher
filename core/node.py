@@ -35,7 +35,7 @@ class Node:
         if not isinstance(attribute, Attribute):
             logger.error("addAttribute takes only Attribute objects. Got " + str(type(attribute)))
         if attribute.key in self.attributes:
-            logging.warning("Attribute with name {nm} already exists. Ignoring.".format(nm=attribute.key))
+            logger.warning("Attribute with name {nm} already exists. Ignoring.".format(nm=attribute.key))
             return
         attribute.parent = self
         self.attributes[attribute.key] = attribute
