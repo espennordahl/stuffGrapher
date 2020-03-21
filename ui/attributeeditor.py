@@ -14,6 +14,7 @@ class AttributeEditor(QDockWidget):
         
         widget = QWidget()
         widget.setMinimumSize(300,100)
+        widget.setMaximumSize(300,10000)
 
         self.layoutWidget = QVBoxLayout()
         self.layoutWidget.setAlignment(Qt.AlignTop)
