@@ -220,7 +220,12 @@ class MainWindow(QMainWindow):
             self.shotBrowser.addShot(shot)
 
     def shotChanged(self, shotname):
-        self.graphLabel.setText(shotname)
+        shot = self.shotBrowser.shots[shotname]
+        if shot.parent:
+            labelText = "{} <{}>".format(shot.name, shot.parent.name)
+        else:
+            labelText = shot.name
+        self.graphLabel.setText(labelText)
         self.nodeGraph.setShot(self.shotBrowser.shots[shotname])
 
 

@@ -30,6 +30,11 @@ class ShotTreeWidget(QTreeWidget):
         super(ShotTreeWidget, self).__init__()
 
     def dropEvent(self, event):
+        """
+        Triggered when an item is released through drag/drop.
+        We allow shots to be dragged into templates, otherwise
+        we ignore it.
+        """
         super(ShotTreeWidget, self).dropEvent(event)
         iterator = QTreeWidgetItemIterator(self)
         while iterator.value():
@@ -38,6 +43,8 @@ class ShotTreeWidget(QTreeWidget):
                 parent = item.parent()
                 if isinstance(parent, TemplateItem):
                     item.shot.parent = parent.shot
+                else:
+                    item.shot.parent = None
                 
             iterator += 1
 
@@ -56,7 +63,7 @@ class ShotBrowser(QDockWidget):
         widget.setLayout(layout)
         self.setWidget(widget)
  
-
+        ## Make sure we can drag/drop shots into templates
         self.tree = ShotTreeWidget()
         self.tree.setColumnCount(1)
         self.tree.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -78,6 +85,10 @@ class ShotBrowser(QDockWidget):
         self.tree.itemChanged.connect(self.itemChanged)
 
     def createTemplate(self):
+        """
+        Creates a new template. 
+        Templates contain graphs that are shared between shots.
+        """
         basename = "template"
         i = 1
         name = basename + str(i)
@@ -89,10 +100,16 @@ class ShotBrowser(QDockWidget):
         self.templates[name] = template
 
     def addShot(self, shot):
+        """
+        Adds a shot to the list
+        """
         item = ShotItem(self.tree, shot)
         self.shots[shot.name] = shot
 
     def currentItemChanged(self, current, previous):
+        """
+        Triggered when an item is selected. 
+        """
         item = self.tree.currentItem()
         if isinstance(item, ShotItem):
             self.shotChanged.emit(item.shot.name)

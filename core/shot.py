@@ -5,8 +5,22 @@ from .graph import Graph
 class Shot:
     def __init__(self, name):
         self.name = name
-        self.parent = None
+        self._parent = None
         self.graph = None
+
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        if value:
+            self.graph = value.graph
+            self._parent = value
+        else:
+            self.graph = Graph()
+            self._parent = None
 
     def serialize(self):
         root = {}
