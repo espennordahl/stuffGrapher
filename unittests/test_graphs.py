@@ -1,4 +1,5 @@
 import unittest
+import json
 
 from random import random, choice
 
@@ -42,8 +43,9 @@ class TestCreate(unittest.TestCase):
         for nodename in graph.nodes:
             self.assertEqual(nodename, graph.nodes[nodename].name)
 
-        json = graph.serialize()
-        revivedGraph = Graph.deserialize(json)
+        json1 = graph.serialize()
+        self.assertTrue(json.dumps(json1))
+        revivedGraph = Graph.deserialize(json1)
         self.assertEqual(graph, revivedGraph)
 
     def test_node_names(self):

@@ -70,7 +70,7 @@ class Attribute:
         root["key"] = self.key
         root["value"] = self.value
         root["hidden"] = self.hidden
-        root["parent"] = self.parent
+        root["parent"] = self.parentName()
         return root
 
     def __eq__(self, other):
@@ -266,7 +266,7 @@ class InputAttribute(Attribute):
         root["class"] = self.__class__.__name__
         root["key"] = self.key
         root["hidden"] = self.hidden
-        root["parent"] = self.parent
+        root["parent"] = self.parentName()
         if self.value:
             root["value"] = str(self.value.name)
         else:

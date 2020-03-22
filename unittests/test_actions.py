@@ -1,4 +1,5 @@
 import unittest
+import json
 
 from core.actions import *
 from core.scenefiles import *
@@ -34,6 +35,7 @@ class TestActions(unittest.TestCase):
     def test_serialize(self):
         for obj1 in self.createActions():
             json1 = obj1.serialize()
+            self.assertTrue(json.dumps(json1))
             obj2 = Action.deserialize(json1)
             for attribute in obj1.attributes:
                 a = obj1[attribute]
