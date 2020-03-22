@@ -11,10 +11,35 @@ logger = logging.getLogger(__name__)
 class ShotItem(QTreeWidgetItem):
     def __init__(self, parent, shot):
         super(ShotItem, self).__init__(parent)
+        self.clipboard = parent.graphClipboard
         self.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
         self.shot = shot
         self.setText(0, self.shot.name)
 
+    def populateRightClickMenu(self, menu):
+        clearAction = menu.addAction("Clear Graph")
+        clearAction.triggered.connect(self.clearGraph)
+
+        copyAction = menu.addAction("Copy Graph")
+        copyAction.triggered.connect(self.copyGraph)
+
+        pasteAction = menu.addAction("Paste Graph")
+        pasteAction.triggered.connect(self.pasteGraph)
+
+    def clearGraph(self):
+        self.shot.graph.clear()
+
+    def copyGraph(self):
+        self.clipboard["graph"] = self.shot.graph.serialize()
+        logger.debug("Clipped graph: {}".format(self.clipboard))
+
+    def pasteGraph(self):
+        if self.clipboard:
+            self.shot.graph.clear()
+            self.shot.graph.paste(self.clipboard["graph"])
+            self.shot.graph.graphChanged()
+        else:
+            logger.debug("No clipboard")
 
 class TemplateItem(QTreeWidgetItem):
     def __init__(self, parent, name):
@@ -29,9 +54,34 @@ class TemplateItem(QTreeWidgetItem):
         self.shot.graph = Graph()
         self.setText(0, self.shot.name)
 
+    def populateRightClickMenu(self, menu):
+        return
+
 class ShotTreeWidget(QTreeWidget):
     def __init__(self):
         super(ShotTreeWidget, self).__init__()
+        ##TODO: Better clipboard handling
+        self.graphClipboard = {"graph": None}
+
+        ## Make sure we can drag/drop shots into templates
+        self.setColumnCount(1)
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setDragEnabled(True)
+        self.viewport().setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
+        self.setSortingEnabled(True)
+
+        ## right click menu
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.rightClickMenu)
+
+    def rightClickMenu(self, event):
+        menu = QMenu(self)
+        selection = self.selectedItems()
+        if selection:
+            selection[0].populateRightClickMenu(menu)
+        menu.exec_(self.mapToGlobal(event))
 
     def dropEvent(self, event):
         """
@@ -67,16 +117,7 @@ class ShotBrowser(QDockWidget):
         widget.setLayout(layout)
         self.setWidget(widget)
  
-        ## Make sure we can drag/drop shots into templates
         self.tree = ShotTreeWidget()
-        self.tree.setColumnCount(1)
-        self.tree.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.tree.setDragEnabled(True)
-        self.tree.viewport().setAcceptDrops(True)
-        self.tree.setDropIndicatorShown(True)
-        self.tree.setDragDropMode(QAbstractItemView.InternalMove)
-        self.tree.setSortingEnabled(True)
-
         layout.addWidget(self.tree)
 
         ## Template button

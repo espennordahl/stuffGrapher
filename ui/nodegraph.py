@@ -118,8 +118,11 @@ class NodeGraphView(QGraphicsView):
         for item in self.scene().items():
             if hasattr(item, "node"):
                 logger.debug("Node already in scene: {}".format(item.node.name))
-                nodesInScene.append(item.node)
-                items.append(item)
+                if item.node in graph.nodes.values():
+                    nodesInScene.append(item.node)
+                    items.append(item)
+                else:
+                    self.scene().removeItem(item)
 
         for node in graph.nodes.values():
             if node in nodesInScene:

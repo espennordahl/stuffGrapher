@@ -23,6 +23,15 @@ class Graph:
         if func not in self._graphChangedCallbacks:
             self._graphChangedCallbacks.append(func)
 
+    def clear(self):
+        self.nodes.clear()
+        self.graphChanged()
+
+    def paste(self, data):
+        tempGraph = Graph.deserialize(data)
+        for node in tempGraph.nodes.values():
+            self.addNode(node)
+
     def createUniqueName(self, name):
         """
         Gives the node a name that is unique to the graph
