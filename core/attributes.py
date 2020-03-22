@@ -350,6 +350,17 @@ class ArrayInputAttribute(InputAttribute):
                     return True
         return False
 
+    def serialize(self):
+        root = {}
+        root["class"] = self.__class__.__name__
+        root["key"] = self.key
+        root["hidden"] = self.hidden
+        root["parent"] = self.parentName()
+        if len(self.value):
+            root["value"] = [x.name for x in self.value]
+        else:
+            root["value"] = []
+        return root
 
 class OutputAttribute(Attribute):
     def __init__(self, key, value=None, parent=None, hidden=False):

@@ -52,11 +52,11 @@ class ShotTreeWidget(QTreeWidget):
 class ShotBrowser(QDockWidget):
     shotChanged = pyqtSignal(str)
 
-    def __init__(self, parent=None):
+    def __init__(self, project, parent=None):
         super(QDockWidget, self).__init__("Shot Browser")
 
-        self.shots = {}
-        self.templates = {}
+        self.shots = project.shots
+        self.templates = project.templates
 
         layout = QVBoxLayout()
         widget = QWidget()
@@ -83,6 +83,18 @@ class ShotBrowser(QDockWidget):
 
         self.tree.currentItemChanged.connect(self.currentItemChanged)
         self.tree.itemChanged.connect(self.itemChanged)
+
+    def setProject(self, project):
+        self.shots = project.shots
+        self.templates = project.templates
+
+        self.tree.clear()
+
+        for shot in self.shots.values():
+            item = ShotItem(self.tree, shot)
+
+        for template in self.templates:
+            item = TemplateItem(self.tree, template)
 
     def createTemplate(self):
         """

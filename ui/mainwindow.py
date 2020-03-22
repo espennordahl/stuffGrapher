@@ -1,5 +1,6 @@
 import sys
 import logging
+import json
 
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -13,12 +14,15 @@ from .nodegraph import *
 
 from core import Shot
 from core import Graph
+from core import Project
 
 logger = logging.getLogger(__name__)
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+
+        self.project = Project()
         
         self.setWindowTitle("StuffGrapher")
         self._initUI()
@@ -54,7 +58,7 @@ class MainWindow(QMainWindow):
         self.attributeEditor.attributeChanged.connect(self.nodeGraph.scene().update)
 
         # Shot Browser
-        self.shotBrowser = ShotBrowser(self)
+        self.shotBrowser = ShotBrowser(self.project, self)
         self.shotBrowser.shotChanged.connect(self.shotChanged)
 
         self.addDockWidget(Qt.LeftDockWidgetArea, self.shotBrowser)
@@ -70,6 +74,7 @@ class MainWindow(QMainWindow):
         openAction = QAction("Open", self)
         openAction.setShortcut("Ctrl+O")
         openAction.setStatusTip("Open File")
+        openAction.triggered.connect(self.open)
         self.fileMenu.addAction(openAction)
 
         ## Save
@@ -222,15 +227,31 @@ class MainWindow(QMainWindow):
             self.shotBrowser.addShot(shot)
 
     def shotChanged(self, shotname):
-        shot = self.shotBrowser.shots[shotname]
+        shot = self.project.shots[shotname]
         if shot.parent:
             labelText = "{} <{}>".format(shot.name, shot.parent.name)
         else:
             labelText = shot.name
         self.graphLabel.setText(labelText)
-        self.nodeGraph.setShot(self.shotBrowser.shots[shotname])
+        self.nodeGraph.setShot(self.project.shots[shotname])
 
     def save(self):
-        
+        self.saveas()
 
     def saveas(self):
+        data = self.project.serialize()
+        filename = QFileDialog.getSaveFileName(self, "Save Project", "/Users/espennordahl/Desktop", "Projects (*.sg)")[0]
+        with open(filename, "w") as outfile:
+            json.dump(data, outfile, indent=4)
+
+    def open(self):
+        filename = QFileDialog.getOpenFileName(self, "Open Project", "/Users/espennordahl/Desktop", "Projects (*.sg)")[0]
+        with open(filename) as infile:
+            data = json.load(infile)
+
+        self.clearProject()
+        self.project = Project.deserialize(data)
+        self.shotBrowser.setProject(self.project)
+
+    def clearProject(self):
+        return
