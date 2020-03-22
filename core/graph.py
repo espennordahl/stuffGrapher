@@ -7,6 +7,8 @@ from core import data
 from core import Node
 from core.attributes import *
 
+logger = logging.getLogger(__name__)
+
 class Graph:
     def __init__(self):
         self.nodes = {}
@@ -52,6 +54,7 @@ class Graph:
     def renameNode(self, node, newname):
         if node not in self.nodes.values():
             logger.error("Asked to rename a node not in the graph")
+            raise Exception
         self.nodes.pop(node.name)
         newname = self.createUniqueName(newname)
         node._name = newname 
@@ -78,6 +81,7 @@ class Graph:
 
         if not module:
             logger.error("Unable to find Node class: {nm}".format(nm=classname))
+            raise Exception
 
         cls = getattr(module, classname)
         node = cls(match)
@@ -97,10 +101,12 @@ class Graph:
         classname = root["class"]
         if classname != "Graph":
             logger.error("Wrong serializer called. Expected Graph, got " + classname)
+            raise Exception
 
         graph = Graph()
         for node in root["nodes"]:
             classname = node["class"]
+            logger.debug("Deserializing {} object".format(classname))
             module = None
             if classname in dir(scenefiles):
                 module = scenefiles
@@ -110,6 +116,7 @@ class Graph:
                 module = data
             if not module:
                 logger.error("Unable to find Node class: {nm}".format(nm=classname))
+                raise Exception
 
             cls = getattr(module, classname)
             obj = cls.deserialize(node)
@@ -121,10 +128,21 @@ class Graph:
 
         for node in graph.nodes.values():
             for attribute in node.attributes.values():
+                ## Update: Uhm, now things have truly gotten messy
+                ## Will clean this up very soon (famous last words..)
                 if isinstance(attribute, InputAttribute):
-                    nodename = attribute.value
-                    if nodename:
-                        attribute.value = graph.nodes[nodename]
+                    if isinstance(attribute, ArrayInputAttribute):
+                        if attribute.value:
+                            nodelist = []
+                            for nodename in attribute.value:
+                                nodelist.append(graph.nodes[nodename])
+                            attribute.value = nodelist
+                        else:
+                            attribute.value = []
+                    else:
+                        nodename = attribute.value
+                        if nodename:
+                            attribute.value = graph.nodes[nodename]
 
         return graph
 

@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import *
 
 from core.attributes import *
 
+logger = logging.getLogger(__name__)
+
 class AttributeEditor(QDockWidget):
 
     attributeChanged = pyqtSignal()

@@ -3,6 +3,8 @@ import json
 
 from .attributes import *
 
+logger = logging.getLogger(__name__)
+
 class Node:
     """
     Base class for all node types
@@ -34,6 +36,7 @@ class Node:
     def addAttribute(self, attribute):
         if not isinstance(attribute, Attribute):
             logger.error("addAttribute takes only Attribute objects. Got " + str(type(attribute)))
+            raise Exception
         if attribute.key in self.attributes:
             logger.warning("Attribute with name {nm} already exists. Ignoring.".format(nm=attribute.key))
             return
@@ -74,7 +77,9 @@ class Node:
     def deserialize(cls, root):
         if root["class"] != "Node":
             logger.error("Wrong deserializer called: " + root["class"])
+            raise Exception
         obj = Node(root["match"])
+        obj.name = root["name"]
 
         attributes = root["attributes"]
         for attrname in attributes:
@@ -89,6 +94,7 @@ class Node:
 
     def serialize(self):
         root = {}
+        root["name"] = self.name
         root["class"] = self.__class__.__name__
         root["attributes"] = {}
         root["match"] = self.match

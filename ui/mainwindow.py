@@ -24,13 +24,14 @@ class MainWindow(QMainWindow):
 
         self.project = Project()
         
-        self.setWindowTitle("StuffGrapher")
         self._initUI()
         self._initMenuBar()
 
         self.show()
 
     def _initUI(self):
+        self.updateWindowTitle()
+
         # Status Bar
         self.statusBar().showMessage("Ready")
         
@@ -239,10 +240,24 @@ class MainWindow(QMainWindow):
         self.saveas()
 
     def saveas(self):
-        data = self.project.serialize()
         filename = QFileDialog.getSaveFileName(self, "Save Project", "/Users/espennordahl/Desktop", "Projects (*.sg)")[0]
+        
+        self.project.filename = filename
+        self.project.name = filename.split(".")[-1]
+ 
+        data = self.project.serialize()
+
+        ## TODO: File safety checks
         with open(filename, "w") as outfile:
             json.dump(data, outfile, indent=4)
+        
+        self.updateWindowTitle()
+
+    def updateWindowTitle(self):
+        if self.project.name:
+            self.setWindowTitle("StuffGrapher - {}".format(self.project.name))
+        else:
+            self.setWindowTitle("StuffGrapher - <Untitled Project>")
 
     def open(self):
         filename = QFileDialog.getOpenFileName(self, "Open Project", "/Users/espennordahl/Desktop", "Projects (*.sg)")[0]
@@ -252,6 +267,7 @@ class MainWindow(QMainWindow):
         self.clearProject()
         self.project = Project.deserialize(data)
         self.shotBrowser.setProject(self.project)
+        self.updateWindowTitle()
 
     def clearProject(self):
         return

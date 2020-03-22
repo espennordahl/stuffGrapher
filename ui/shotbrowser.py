@@ -1,8 +1,12 @@
+import logging
+
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from core import Shot, Graph
+
+logger = logging.getLogger(__name__)
 
 class ShotItem(QTreeWidgetItem):
     def __init__(self, parent, shot):

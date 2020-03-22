@@ -4,6 +4,8 @@ from .node import Node
 from core import data
 from .attributes import *
 
+logger = logging.getLogger(__name__)
+
 class Action(Node):
     def __init__(self, match):
         super(Action, self).__init__(match)
@@ -30,12 +32,14 @@ class Action(Node):
         classname = root["class"]
         if not classname in dir(core.actions):
             logger.error("Unable to deserialize. Unknown classname: " + classname)
+            raise Exception
 
         cls = getattr(core.actions, classname)
 
         match = root["match"]
 
         obj = cls(root["match"])
+        obj.name = root["name"]
 
         attributes = root["attributes"]
         for attrname in attributes:
@@ -58,9 +62,11 @@ class Action(Node):
     def createData(self, dataType):
         if dataType not in self.knownData():
             logger.error("Tried to create incompatible or unknown data: " + dataType)
+            raise Exception
 
         if not dataType in dir(data):
             logger.error("Tried to create non existing data type: " + dataType)
+            raise Exception
 
         cls = getattr(data, dataType)
         node = cls(self.match)

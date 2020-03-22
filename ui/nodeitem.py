@@ -149,6 +149,7 @@ class NodeSocket(QGraphicsItem):
             self.scene().addItem(self.newLine)
         else:
             logger.error("Unable to create new line. Attribute is not input or output")
+            raise Exception
  
     def updateNewLine(self, pos):
         """
@@ -414,6 +415,7 @@ class NodeItem(QGraphicsItem):
                             item = x
                 if not item:
                     logger.error("Couldn't find item by name: " + str(inputNode.name))
+                    raise Exception
 
                 ## TODO: We should connect to attributes and not nodes..
                 ## But this should work as long for single output nodes

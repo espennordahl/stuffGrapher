@@ -11,6 +11,7 @@ class Attribute:
             self.key = str(key)
         else:
             logger.error("Attribute names must be strings. Received: " + type(key))
+            raise Exception
         if isinstance(parent, (bool, str, float, int, list, tuple)):
             logger.error("Parent can't be of type: {}".format(type(parent)))
             raise Exception
@@ -23,9 +24,11 @@ class Attribute:
         classname = root["class"]
         if not classname in dir(sys.modules[__name__]):
             logger.error("Asked to deserialize unknown class: " + classname)
+            raise Exception
         
         if classname == self.__class__.__name__:
             logger.error("Asked to serialize Attribute, which is an abstract class")
+            raise Exception
 
         cls = getattr(sys.modules[__name__], classname)
         obj = cls.deserialize(root)

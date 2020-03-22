@@ -2,6 +2,8 @@ import logging
 
 from core.scenefile import SceneFile
 
+logger = logging.getLogger(__name__)
+
 class NukeFile(SceneFile):
     def __init__(self, match):
         super(NukeFile, self).__init__(match)

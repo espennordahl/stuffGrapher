@@ -10,6 +10,8 @@ from core import Node, Graph, SceneFile, Action, Data
 from core.attributes import *
 
 
+logger = logging.getLogger(__name__)
+
 class NodeGraphView(QGraphicsView):
     selectionChanged = pyqtSignal(list)
 
@@ -92,7 +94,7 @@ class NodeGraphView(QGraphicsView):
         elif isinstance(node, Data):
             return DataNodeItem(node)
         else:
-            logging.warining("Unable to create graphics item for node type: " + node.__class__.__name__)
+            logging.warning("Unable to create graphics item for node type: " + node.__class__.__name__)
             return None
  
 

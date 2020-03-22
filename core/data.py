@@ -3,6 +3,8 @@ import logging
 from .node import Node
 from .attributes import *
 
+logger = logging.getLogger(__name__)
+
 class Data(Node):
     def __init__(self, match):
         super(Data, self).__init__(match)
@@ -22,6 +24,32 @@ class Data(Node):
             return False
         from .action import Action
         return isinstance(connection.value, Action)
+
+    @classmethod
+    def deserialize(cls, root):
+        classname = root["class"]
+        if not classname in dir(sys.modules[__name__]):
+            logger.error("Unable to deserialize. Unknown classname: " + classname)
+            raise Exception
+
+        cls = getattr(sys.modules[__name__], classname)
+
+        match = root["match"]
+
+        obj = cls(root["match"])
+        obj.name = root["name"]
+
+        attributes = root["attributes"]
+        for attrname in attributes:
+            attribute = Attribute.deserialize(attributes[attrname])
+            attribute.parent = obj
+            if attrname in obj.attributes:
+                obj.attributes[attrname] = attribute
+            else:
+                obj.addAttribute(attribute)
+
+        return obj
+
 
 class GeoData(Data):
     def __init__(self, match):

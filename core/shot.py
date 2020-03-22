@@ -2,6 +2,8 @@ import logging
 
 from .graph import Graph
 
+logger = logging.getLogger(__name__)
+
 class Shot:
     def __init__(self, name):
         self.name = name
@@ -45,6 +47,7 @@ class Shot:
     def deserialize(self, root):
         if root["class"] != "Shot":
             logging.error("Wrong deserializer called: " + root["class"])
+            raise Exception
 
         name = root["name"]
         obj = Shot(name)

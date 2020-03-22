@@ -5,6 +5,8 @@ from .data import Data
 import core.actions
 from .attributes import *
 
+logger = logging.getLogger(__name__)
+
 departments = [
                 "anim",
                 "conform",
@@ -40,9 +42,11 @@ class SceneFile(Node):
     def createAction(self, actionname, match):
         if actionname not in self.knownActions():
             logger.error("Tried to create incompatible or unknown action: " + actionname)
+            raise Exception
 
         if not actionname in dir(core.actions):
             logger.error("Tried to create non existing action object: " + actionname)
+            raise Exception
 
         cls = getattr(core.actions, actionname)
         action = cls(match)
@@ -60,12 +64,14 @@ class SceneFile(Node):
         classname = root["class"]
         if not classname in dir(core.scenefiles):
             logger.error("Unable to deserialize. Unknown classname: " + classname)
+            raise Exception
 
         cls = getattr(core.scenefiles, classname)
 
         match = root["match"]
 
         obj = cls(root["match"])
+        obj.name = root["name"]
 
         attributes = root["attributes"]
         for attrname in attributes:

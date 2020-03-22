@@ -3,6 +3,8 @@ import logging
 
 from .shot import Shot
 
+logger = logging.getLogger(__name__)
+
 class Project:
     """
     Container for an entire project.
@@ -44,6 +46,7 @@ class Project:
     def deserialize(cls, root):
         if root["class"] != "Project":
             logger.error("Wrong deserializer called: " + root["class"])
+            raise Exception
         
         name = root["name"]
         filename = root["filename"]
