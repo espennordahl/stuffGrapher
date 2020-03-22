@@ -237,22 +237,26 @@ class MainWindow(QMainWindow):
         self.nodeGraph.setShot(self.project.shots[shotname])
 
     def save(self):
-        self.saveas()
+        if not self.project.filename:
+            self.saveas()
+
+        data = self.project.serialize()
+
+        ## TODO: File safety checks
+        with open(self.project.filename, "w") as outfile:
+            json.dump(data, outfile, indent=4)
+        
+        self.updateWindowTitle()
+
 
     def saveas(self):
         filename = QFileDialog.getSaveFileName(self, "Save Project", "/Users/espennordahl/Desktop", "Projects (*.sg)")[0]
         
         self.project.filename = filename
-        self.project.name = filename.split(".")[-1]
+        self.project.name = filename.split("/")[-1]
+
+        self.save()
  
-        data = self.project.serialize()
-
-        ## TODO: File safety checks
-        with open(filename, "w") as outfile:
-            json.dump(data, outfile, indent=4)
-        
-        self.updateWindowTitle()
-
     def updateWindowTitle(self):
         if self.project.name:
             self.setWindowTitle("StuffGrapher - {}".format(self.project.name))

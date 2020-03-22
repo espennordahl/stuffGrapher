@@ -1,0 +1,985 @@
+{
+    "class": "Project",
+    "name": "test.sg",
+    "shots": {
+        "fx010": {
+            "class": "Shot",
+            "name": "fx010",
+            "graph": {
+                "class": "Graph",
+                "nodes": [
+                    {
+                        "name": "MayaFile",
+                        "class": "MayaFile",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 16667.0,
+                                "hidden": true,
+                                "parent": "MayaFile"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15651.0,
+                                "hidden": true,
+                                "parent": "MayaFile"
+                            },
+                            "input": {
+                                "class": "ArrayInputAttribute",
+                                "key": "input",
+                                "hidden": true,
+                                "parent": "MayaFile",
+                                "value": [
+                                    "GeocacheData",
+                                    "PlateData",
+                                    "GeocacheData",
+                                    "PlateData",
+                                    "GeocacheData1",
+                                    "GeocacheData2",
+                                    "GeocacheData3",
+                                    "GeocacheData",
+                                    "PlateData",
+                                    "GeocacheData1",
+                                    "GeocacheData2",
+                                    "GeocacheData3"
+                                ]
+                            },
+                            "department": {
+                                "class": "EnumAttribute",
+                                "key": "department",
+                                "value": 5,
+                                "hidden": false,
+                                "parent": "MayaFile",
+                                "elements": [
+                                    "anim",
+                                    "conform",
+                                    "comp",
+                                    "fx",
+                                    "layout",
+                                    "lit",
+                                    "model",
+                                    "rig",
+                                    "shd",
+                                    "txtr"
+                                ]
+                            },
+                            "partname": {
+                                "class": "StringAttribute",
+                                "key": "partname",
+                                "value": "main",
+                                "hidden": false,
+                                "parent": "MayaFile"
+                            },
+                            "template": {
+                                "class": "EnumAttribute",
+                                "key": "template",
+                                "value": 3,
+                                "hidden": false,
+                                "parent": "MayaFile",
+                                "elements": [
+                                    "DefaultTemplate",
+                                    "LayoutTemplate",
+                                    "AnimTemplate",
+                                    "LightingTemplate"
+                                ]
+                            }
+                        },
+                        "match": "foo"
+                    },
+                    {
+                        "name": "MayaFile1",
+                        "class": "MayaFile",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 15555.0,
+                                "hidden": true,
+                                "parent": "MayaFile1"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15836.0,
+                                "hidden": true,
+                                "parent": "MayaFile1"
+                            },
+                            "input": {
+                                "class": "ArrayInputAttribute",
+                                "key": "input",
+                                "hidden": true,
+                                "parent": "MayaFile1",
+                                "value": []
+                            },
+                            "department": {
+                                "class": "EnumAttribute",
+                                "key": "department",
+                                "value": 0,
+                                "hidden": false,
+                                "parent": "MayaFile1",
+                                "elements": [
+                                    "anim",
+                                    "conform",
+                                    "comp",
+                                    "fx",
+                                    "layout",
+                                    "lit",
+                                    "model",
+                                    "rig",
+                                    "shd",
+                                    "txtr"
+                                ]
+                            },
+                            "partname": {
+                                "class": "StringAttribute",
+                                "key": "partname",
+                                "value": "main",
+                                "hidden": false,
+                                "parent": "MayaFile1"
+                            },
+                            "template": {
+                                "class": "EnumAttribute",
+                                "key": "template",
+                                "value": 2,
+                                "hidden": false,
+                                "parent": "MayaFile1",
+                                "elements": [
+                                    "DefaultTemplate",
+                                    "LayoutTemplate",
+                                    "AnimTemplate",
+                                    "LightingTemplate"
+                                ]
+                            }
+                        },
+                        "match": "foo"
+                    },
+                    {
+                        "name": "PublishGeocacheAction",
+                        "class": "PublishGeocacheAction",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 15705.0,
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15836.0,
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction"
+                            },
+                            "scenefile": {
+                                "class": "InputAttribute",
+                                "key": "scenefile",
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction",
+                                "value": "MayaFile1"
+                            },
+                            "subpart": {
+                                "class": "StringAttribute",
+                                "key": "subpart",
+                                "value": "dragon",
+                                "hidden": false,
+                                "parent": "PublishGeocacheAction"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "GeocacheData",
+                        "class": "GeocacheData",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 15955.0,
+                                "hidden": true,
+                                "parent": "GeocacheData"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15836.0,
+                                "hidden": true,
+                                "parent": "GeocacheData"
+                            },
+                            "action": {
+                                "class": "InputAttribute",
+                                "key": "action",
+                                "hidden": true,
+                                "parent": "GeocacheData",
+                                "value": "PublishGeocacheAction"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "PlateData",
+                        "class": "PlateData",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 16438.0,
+                                "hidden": true,
+                                "parent": "PlateData"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15342.0,
+                                "hidden": true,
+                                "parent": "PlateData"
+                            },
+                            "action": {
+                                "class": "InputAttribute",
+                                "key": "action",
+                                "hidden": true,
+                                "parent": "PlateData",
+                                "value": null
+                            }
+                        },
+                        "match": "foo"
+                    },
+                    {
+                        "name": "RenderAction",
+                        "class": "RenderAction",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 16867.0,
+                                "hidden": true,
+                                "parent": "RenderAction"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15651.0,
+                                "hidden": true,
+                                "parent": "RenderAction"
+                            },
+                            "scenefile": {
+                                "class": "InputAttribute",
+                                "key": "scenefile",
+                                "hidden": true,
+                                "parent": "RenderAction",
+                                "value": "MayaFile"
+                            },
+                            "subpart": {
+                                "class": "StringAttribute",
+                                "key": "subpart",
+                                "value": "dragon",
+                                "hidden": false,
+                                "parent": "RenderAction"
+                            },
+                            "updateResources": {
+                                "class": "BoolAttribute",
+                                "key": "updateResources",
+                                "value": true,
+                                "hidden": false,
+                                "parent": "RenderAction"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "RenderData",
+                        "class": "RenderData",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 17067.0,
+                                "hidden": true,
+                                "parent": "RenderData"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15651.0,
+                                "hidden": true,
+                                "parent": "RenderData"
+                            },
+                            "action": {
+                                "class": "InputAttribute",
+                                "key": "action",
+                                "hidden": true,
+                                "parent": "RenderData",
+                                "value": "RenderAction"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "NukeFile",
+                        "class": "NukeFile",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 17240.0,
+                                "hidden": true,
+                                "parent": "NukeFile"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15647.0,
+                                "hidden": true,
+                                "parent": "NukeFile"
+                            },
+                            "input": {
+                                "class": "ArrayInputAttribute",
+                                "key": "input",
+                                "hidden": true,
+                                "parent": "NukeFile",
+                                "value": [
+                                    "RenderData",
+                                    "PlateData",
+                                    "RenderData",
+                                    "PlateData",
+                                    "RenderData",
+                                    "PlateData",
+                                    "RenderData1",
+                                    "RenderData2"
+                                ]
+                            },
+                            "department": {
+                                "class": "EnumAttribute",
+                                "key": "department",
+                                "value": 2,
+                                "hidden": false,
+                                "parent": "NukeFile",
+                                "elements": [
+                                    "anim",
+                                    "conform",
+                                    "comp",
+                                    "fx",
+                                    "layout",
+                                    "lit",
+                                    "model",
+                                    "rig",
+                                    "shd",
+                                    "txtr"
+                                ]
+                            },
+                            "partname": {
+                                "class": "StringAttribute",
+                                "key": "partname",
+                                "value": "master",
+                                "hidden": false,
+                                "parent": "NukeFile"
+                            },
+                            "template": {
+                                "class": "EnumAttribute",
+                                "key": "template",
+                                "value": 0,
+                                "hidden": false,
+                                "parent": "NukeFile",
+                                "elements": [
+                                    "CompTemplate",
+                                    "MatchMoveTemplate",
+                                    "SlapcompTemplate",
+                                    "VersionZeroTemplate"
+                                ]
+                            }
+                        },
+                        "match": "foo"
+                    },
+                    {
+                        "name": "PublishGeocacheAction1",
+                        "class": "PublishGeocacheAction",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 15700.0,
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction1"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15936.0,
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction1"
+                            },
+                            "scenefile": {
+                                "class": "InputAttribute",
+                                "key": "scenefile",
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction1",
+                                "value": "MayaFile1"
+                            },
+                            "subpart": {
+                                "class": "StringAttribute",
+                                "key": "subpart",
+                                "value": "robot",
+                                "hidden": false,
+                                "parent": "PublishGeocacheAction1"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "GeocacheData1",
+                        "class": "GeocacheData",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 15945.0,
+                                "hidden": true,
+                                "parent": "GeocacheData1"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15935.0,
+                                "hidden": true,
+                                "parent": "GeocacheData1"
+                            },
+                            "action": {
+                                "class": "InputAttribute",
+                                "key": "action",
+                                "hidden": true,
+                                "parent": "GeocacheData1",
+                                "value": "PublishGeocacheAction1"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "HoudiniFile",
+                        "class": "HoudiniFile",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 16120.0,
+                                "hidden": true,
+                                "parent": "HoudiniFile"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 16020.0,
+                                "hidden": true,
+                                "parent": "HoudiniFile"
+                            },
+                            "input": {
+                                "class": "ArrayInputAttribute",
+                                "key": "input",
+                                "hidden": true,
+                                "parent": "HoudiniFile",
+                                "value": [
+                                    "GeocacheData1",
+                                    "GeocacheData1"
+                                ]
+                            },
+                            "department": {
+                                "class": "EnumAttribute",
+                                "key": "department",
+                                "value": 3,
+                                "hidden": false,
+                                "parent": "HoudiniFile",
+                                "elements": [
+                                    "anim",
+                                    "conform",
+                                    "comp",
+                                    "fx",
+                                    "layout",
+                                    "lit",
+                                    "model",
+                                    "rig",
+                                    "shd",
+                                    "txtr"
+                                ]
+                            },
+                            "partname": {
+                                "class": "StringAttribute",
+                                "key": "partname",
+                                "value": "robot",
+                                "hidden": false,
+                                "parent": "HoudiniFile"
+                            },
+                            "template": {
+                                "class": "EnumAttribute",
+                                "key": "template",
+                                "value": 0,
+                                "hidden": false,
+                                "parent": "HoudiniFile",
+                                "elements": [
+                                    "FXTemplate",
+                                    "LayoutTemplate"
+                                ]
+                            }
+                        },
+                        "match": "foo"
+                    },
+                    {
+                        "name": "PublishGeocacheAction2",
+                        "class": "PublishGeocacheAction",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 16296.0,
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction2"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 16020.0,
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction2"
+                            },
+                            "scenefile": {
+                                "class": "InputAttribute",
+                                "key": "scenefile",
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction2",
+                                "value": "HoudiniFile"
+                            },
+                            "subpart": {
+                                "class": "StringAttribute",
+                                "key": "subpart",
+                                "value": "explosion",
+                                "hidden": false,
+                                "parent": "PublishGeocacheAction2"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "GeocacheData2",
+                        "class": "GeocacheData",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 16509.0,
+                                "hidden": true,
+                                "parent": "GeocacheData2"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 16020.0,
+                                "hidden": true,
+                                "parent": "GeocacheData2"
+                            },
+                            "action": {
+                                "class": "InputAttribute",
+                                "key": "action",
+                                "hidden": true,
+                                "parent": "GeocacheData2",
+                                "value": "PublishGeocacheAction2"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "PublishGeocacheAction3",
+                        "class": "PublishGeocacheAction",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 16292.0,
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction3"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 16110.0,
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction3"
+                            },
+                            "scenefile": {
+                                "class": "InputAttribute",
+                                "key": "scenefile",
+                                "hidden": true,
+                                "parent": "PublishGeocacheAction3",
+                                "value": "HoudiniFile"
+                            },
+                            "subpart": {
+                                "class": "StringAttribute",
+                                "key": "subpart",
+                                "value": "thrusters",
+                                "hidden": false,
+                                "parent": "PublishGeocacheAction3"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "GeocacheData3",
+                        "class": "GeocacheData",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 16513.0,
+                                "hidden": true,
+                                "parent": "GeocacheData3"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 16110.0,
+                                "hidden": true,
+                                "parent": "GeocacheData3"
+                            },
+                            "action": {
+                                "class": "InputAttribute",
+                                "key": "action",
+                                "hidden": true,
+                                "parent": "GeocacheData3",
+                                "value": "PublishGeocacheAction3"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "RenderAction1",
+                        "class": "RenderAction",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 16867.0,
+                                "hidden": true,
+                                "parent": "RenderAction1"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15736.0,
+                                "hidden": true,
+                                "parent": "RenderAction1"
+                            },
+                            "scenefile": {
+                                "class": "InputAttribute",
+                                "key": "scenefile",
+                                "hidden": true,
+                                "parent": "RenderAction1",
+                                "value": "MayaFile"
+                            },
+                            "subpart": {
+                                "class": "StringAttribute",
+                                "key": "subpart",
+                                "value": "exposion",
+                                "hidden": false,
+                                "parent": "RenderAction1"
+                            },
+                            "updateResources": {
+                                "class": "BoolAttribute",
+                                "key": "updateResources",
+                                "value": true,
+                                "hidden": false,
+                                "parent": "RenderAction1"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "RenderAction2",
+                        "class": "RenderAction",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 16867.0,
+                                "hidden": true,
+                                "parent": "RenderAction2"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15844.0,
+                                "hidden": true,
+                                "parent": "RenderAction2"
+                            },
+                            "scenefile": {
+                                "class": "InputAttribute",
+                                "key": "scenefile",
+                                "hidden": true,
+                                "parent": "RenderAction2",
+                                "value": "MayaFile"
+                            },
+                            "subpart": {
+                                "class": "StringAttribute",
+                                "key": "subpart",
+                                "value": "thursters",
+                                "hidden": false,
+                                "parent": "RenderAction2"
+                            },
+                            "updateResources": {
+                                "class": "BoolAttribute",
+                                "key": "updateResources",
+                                "value": true,
+                                "hidden": false,
+                                "parent": "RenderAction2"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "RenderData1",
+                        "class": "RenderData",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 17067.0,
+                                "hidden": true,
+                                "parent": "RenderData1"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15736.0,
+                                "hidden": true,
+                                "parent": "RenderData1"
+                            },
+                            "action": {
+                                "class": "InputAttribute",
+                                "key": "action",
+                                "hidden": true,
+                                "parent": "RenderData1",
+                                "value": "RenderAction1"
+                            }
+                        },
+                        "match": ""
+                    },
+                    {
+                        "name": "RenderData2",
+                        "class": "RenderData",
+                        "attributes": {
+                            "out": {
+                                "class": "OutputAttribute",
+                                "key": "out",
+                                "hidden": true,
+                                "value": null
+                            },
+                            "pos.x": {
+                                "class": "FloatAttribute",
+                                "key": "pos.x",
+                                "value": 17067.0,
+                                "hidden": true,
+                                "parent": "RenderData2"
+                            },
+                            "pos.y": {
+                                "class": "FloatAttribute",
+                                "key": "pos.y",
+                                "value": 15844.0,
+                                "hidden": true,
+                                "parent": "RenderData2"
+                            },
+                            "action": {
+                                "class": "InputAttribute",
+                                "key": "action",
+                                "hidden": true,
+                                "parent": "RenderData2",
+                                "value": "RenderAction2"
+                            }
+                        },
+                        "match": ""
+                    }
+                ]
+            },
+            "parent": null
+        },
+        "fx020": {
+            "class": "Shot",
+            "name": "fx020",
+            "graph": {
+                "class": "Graph",
+                "nodes": []
+            },
+            "parent": null
+        },
+        "fx030": {
+            "class": "Shot",
+            "name": "fx030",
+            "graph": {
+                "class": "Graph",
+                "nodes": []
+            },
+            "parent": null
+        },
+        "fx040": {
+            "class": "Shot",
+            "name": "fx040",
+            "graph": {
+                "class": "Graph",
+                "nodes": []
+            },
+            "parent": null
+        },
+        "fx100": {
+            "class": "Shot",
+            "name": "fx100",
+            "graph": {
+                "class": "Graph",
+                "nodes": []
+            },
+            "parent": null
+        },
+        "fx120": {
+            "class": "Shot",
+            "name": "fx120",
+            "graph": {
+                "class": "Graph",
+                "nodes": []
+            },
+            "parent": null
+        },
+        "vg040": {
+            "class": "Shot",
+            "name": "vg040",
+            "graph": {
+                "class": "Graph",
+                "nodes": []
+            },
+            "parent": null
+        },
+        "vg045": {
+            "class": "Shot",
+            "name": "vg045",
+            "graph": {
+                "class": "Graph",
+                "nodes": []
+            },
+            "parent": null
+        },
+        "vg080": {
+            "class": "Shot",
+            "name": "vg080",
+            "graph": {
+                "class": "Graph",
+                "nodes": []
+            },
+            "parent": null
+        }
+    },
+    "templates": {},
+    "filename": "/Users/espennordahl/Desktop/test.sg"
+}
