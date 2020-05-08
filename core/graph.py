@@ -79,6 +79,13 @@ class Graph:
         logger.debug("Node list: {}".format(self.nodes.keys()))
         self.graphChanged()
 
+    def removeNode(self, node):
+        for key, value in self.nodes.items():
+            if value == node:
+                del self.nodes[key]
+                self.graphChanged()
+                return
+
     def createNode(self, classname, match):
         module = None
         if classname in dir(scenefiles):

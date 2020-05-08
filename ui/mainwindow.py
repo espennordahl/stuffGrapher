@@ -11,6 +11,7 @@ import qdarkstyle
 from .attributeeditor import AttributeEditor
 from .shotbrowser import ShotBrowser
 from .nodegraph import *
+from .commands import *
 
 from core import Shot
 from core import Graph
@@ -21,6 +22,8 @@ logger = logging.getLogger(__name__)
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        
+        self.undoStack = QUndoStack(self)
 
         self.project = Project()
         
@@ -103,14 +106,14 @@ class MainWindow(QMainWindow):
         self.editMenu = menuBar.addMenu("Edit")
 
         ## Undo
-        undoAction = QAction("Undo", self)
+        undoAction = self.undoStack.createUndoAction(self, "Undo")
         undoAction.setShortcut("Ctrl+z")
         undoAction.setStatusTip("Undo")
         self.editMenu.addAction(undoAction)
 
         ## Redo
-        redoAction = QAction("Redo", self)
-        redoAction.setShortcut("Ctrl+y")
+        redoAction = self.undoStack.createRedoAction(self, "Redo")
+        redoAction.setShortcuts(["Ctrl+y", "Ctrl+Z"])
         redoAction.setStatusTip("Redo")
         self.editMenu.addAction(redoAction)
 
@@ -208,7 +211,11 @@ class MainWindow(QMainWindow):
 
 
     def createNode(self, classname):
-        self.nodeGraph.createNode(classname)
+        createCommand = CreateNodeCommand(  classname, 
+                                            self.nodeGraph.shot, 
+                                            self.nodeGraph.mapToScene(self.nodeGraph.mousePosLocal))
+        self.undoStack.push(createCommand)
+        #self.nodeGraph.createNode(classname)
 
     def importShots(self):
         tempshots = [
