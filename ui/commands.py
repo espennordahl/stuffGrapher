@@ -13,11 +13,7 @@ class CreateNodeCommand(QUndoCommand):
         QUndoCommand.__init__(self, parent)
         self._classname = classname
         self._nodegraph = shot.graph
-        self._node = self._nodegraph.createNode(classname, "foo") 
         self._pos = pos        
-        self._node["pos.x"].value = self._pos.x()
-        self._node["pos.y"].value = self._pos.y()
-        self._nodegraph.graphChanged()
 
     def undo(self):
         self._nodegraph.removeNode(self._node)
