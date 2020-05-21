@@ -14,6 +14,7 @@ class CreateNodeCommand(QUndoCommand):
         self._classname = classname
         self._nodegraph = shot.graph
         self._pos = pos        
+        self._node = None
 
     def undo(self):
         logger.info("Undoing Create Node")
@@ -22,7 +23,11 @@ class CreateNodeCommand(QUndoCommand):
 
     def redo(self):
         logger.info("Creaating Node")
-        self._node = self._nodegraph.createNode(self._classname, "foo") 
+        if self._node:
+            self._nodegraph.addNode(self._node)
+        else:
+            self._node = self._nodegraph.createNode(self._classname, "foo") 
+
         self._node["pos.x"].value = self._pos.x()
         self._node["pos.y"].value = self._pos.y()
         self._nodegraph.graphChanged()
