@@ -109,6 +109,12 @@ class NodeGraphView(QGraphicsView):
         self.shot.graph.addGraphChangedCallback(self.graphChanged)
         self.graphChanged()
 
+    def shotname(self):
+        if self.shot:
+            return self.shot.name
+        else:
+            return None
+
     def graphChanged(self):
         graph = self.shot.graph
         logger.debug("Graph has {num} nodes. Populating.".format(num=len(graph.nodes)))

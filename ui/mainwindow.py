@@ -63,7 +63,7 @@ class MainWindow(QMainWindow):
 
         # Shot Browser
         self.shotBrowser = ShotBrowser(self.project, self)
-        self.shotBrowser.shotChanged.connect(self.shotChanged)
+        self.shotBrowser.shotChanged.connect(self.shotSelectionChanged)
 
         self.addDockWidget(Qt.LeftDockWidgetArea, self.shotBrowser)
 
@@ -215,7 +215,6 @@ class MainWindow(QMainWindow):
                                             self.nodeGraph.shot, 
                                             self.nodeGraph.mapToScene(self.nodeGraph.mousePosLocal))
         self.undoStack.push(createCommand)
-        #self.nodeGraph.createNode(classname)
 
     def importShots(self):
         tempshots = [
@@ -234,14 +233,14 @@ class MainWindow(QMainWindow):
             shot.graph = Graph()
             self.shotBrowser.addShot(shot)
 
-    def shotChanged(self, shotname):
-        shot = self.project.shots[shotname]
-        if shot.parent:
-            labelText = "{} <{}>".format(shot.name, shot.parent.name)
-        else:
-            labelText = shot.name
-        self.graphLabel.setText(labelText)
-        self.nodeGraph.setShot(self.project.shots[shotname])
+    def shotSelectionChanged(self, shotname):
+        switchCommand = SwitchShotCommand(  self.nodeGraph.shot, 
+                                            self.project.shots[shotname],
+                                            self.graphLabel,
+                                            self.nodeGraph,
+                                            self.shotBrowser)
+        self.undoStack.push(switchCommand)
+
 
     def save(self):
         if not self.project.filename:

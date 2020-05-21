@@ -109,6 +109,7 @@ class ShotBrowser(QDockWidget):
     def __init__(self, project, parent=None):
         super(QDockWidget, self).__init__("Shot Browser")
 
+        self._pauseSignals = False
         self.shots = project.shots
         self.templates = project.templates
 
@@ -169,7 +170,8 @@ class ShotBrowser(QDockWidget):
         """
         item = self.tree.currentItem()
         if isinstance(item, ShotItem):
-            self.shotChanged.emit(item.shot.name)
+            if not self._pauseSignals:
+                self.shotChanged.emit(item.shot.name)
 
     def itemChanged(self, item, column):
         if isinstance(item, TemplateItem):
@@ -183,4 +185,20 @@ class ShotBrowser(QDockWidget):
                 item.setText(0, name)
                 item.shot.name = name
                 self.templates[name] = item
+
+    def setShot(self, shotname):
+        iterator = QTreeWidgetItemIterator(self.tree)
+        while iterator.value():
+            item = iterator.value()
+            if isinstance(item, ShotItem):
+                if item.shot.name == shotname:
+                    ## We only emit signals when the user clicks
+                    ## a shot, so we pause emission when switching
+                    self._pauseSignals = True
+                    self.tree.setCurrentItem(item)
+                    self._pauseSignals = False
+                    return
+            iterator += 1
+
+
 

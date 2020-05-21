@@ -25,4 +25,29 @@ class CreateNodeCommand(QUndoCommand):
         self._node["pos.y"].value = self._pos.y()
         self._nodegraph.graphChanged()
 
-       
+class SwitchShotCommand(QUndoCommand):
+    def __init__(self, fromShot, toShot, graphLabel, nodeGraph, shotBrowser, parent=None):
+        QUndoCommand.__init__(self, parent)
+        self._fromShot = fromShot
+        self._toShot = toShot
+        self._graphLabel = graphLabel
+        self._nodeGraph = nodeGraph
+        self._shotBrowser = shotBrowser
+
+    def setShot(self, shot):
+        if not shot:
+            ##TODO: Set selection to none
+            return
+        if shot.parent:
+            labelText = "{} <{}>".format(shot.name, shot.parent.name)
+        else:
+            labelText = shot.name
+        self._graphLabel.setText(labelText)
+        self._nodeGraph.setShot(shot)
+        self._shotBrowser.setShot(shot.name)
+
+    def undo(self): 
+        self.setShot(self._fromShot)
+
+    def redo(self):
+        self.setShot(self._toShot)
