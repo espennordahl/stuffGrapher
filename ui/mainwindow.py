@@ -244,14 +244,20 @@ class MainWindow(QMainWindow):
 
     def save(self):
         if not self.project.filename:
+            logger.debug("Project doesn't have filename. Asking for one")
             self.saveas()
+            return
 
+        logger.debug("Serializing data")
         data = self.project.serialize()
+        logger.debug("Serialization successfull")
 
         ## TODO: File safety checks
+        logger.info("Writing File {}".format(self.project.filename))
         with open(self.project.filename, "w") as outfile:
             json.dump(data, outfile, indent=4)
-        
+        logger.info("File saved successfully")
+        self.undoStack.setClean()
         self.updateWindowTitle()
 
 
@@ -278,6 +284,24 @@ class MainWindow(QMainWindow):
         self.project = Project.deserialize(data)
         self.shotBrowser.setProject(self.project)
         self.updateWindowTitle()
+
+    def closeEvent(self, event):
+        if self.undoStack.isClean():
+            event.accept()
+        else:
+            msgBox = QMessageBox()
+            msgBox.setText("The document has been modified.")
+            msgBox.setInformativeText("Do you want to save your changes?")
+            msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+            msgBox.setDefaultButton(QMessageBox.Save)
+            ret = msgBox.exec_()
+            if ret == QMessageBox.Save:
+                self.save()
+                event.accept()
+            elif ret == QMessageBox.Discard:
+                event.accept()
+            else:
+                event.ignore()
 
     def clearProject(self):
         return
