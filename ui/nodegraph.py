@@ -9,6 +9,7 @@ from .nodeitem import *
 from core import Node, Graph, SceneFile, Action, Data
 from core.attributes import *
 
+from .commands import *
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ class NodeGraphView(QGraphicsView):
 
     def __init__(self, parent=None):
         super(NodeGraphView, self).__init__(parent)
+        self.undoStack = parent.undoStack
         self.nodes = []
         self.shot = None
         self.mousePosLocal = QPoint(0,0)
@@ -77,7 +79,7 @@ class NodeGraphView(QGraphicsView):
         pos = self.mapToScene(self.mousePosLocal)
         node["pos.x"].value = pos.x()
         node["pos.y"].value = pos.y()
-        ## TODO: Cleaner way of doing this:
+
         node.graph.graphChanged()
         
 
@@ -88,11 +90,11 @@ class NodeGraphView(QGraphicsView):
 
     def itemFromNode(self, node):
         if isinstance(node, SceneFile):
-            return SceneNodeItem(node)
+            return SceneNodeItem(self, node)
         elif isinstance(node, Action):
-            return ActionNodeItem(node)
+            return ActionNodeItem(self, node)
         elif isinstance(node, Data):
-            return DataNodeItem(node)
+            return DataNodeItem(self, node)
         else:
             logging.warning("Unable to create graphics item for node type: " + node.__class__.__name__)
             return None

@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import *
 from core import Graph, SceneFile, Action, Data
 from core.attributes import *
 
+from .commands import *
+
 logger = logging.getLogger(__name__)
 
 class NodeLine(QGraphicsPathItem):
@@ -270,8 +272,16 @@ class NodeSocket(QGraphicsItem):
                 line.pointB = line.target.getCenter()
 
 class NodeItem(QGraphicsItem):
-    def __init__(self, node=None):
+    def __init__(self, controller, node=None):
         super(NodeItem, self).__init__()
+
+        self.setFlag(QGraphicsItem.ItemIsSelectable)
+
+        self.controller = controller
+        self.oldPos = self.pos()
+        self.updating = False
+        self.moving = False
+
         self.node = node
 
         self.inputs = []
@@ -280,9 +290,6 @@ class NodeItem(QGraphicsItem):
         textWidth = len(node.name) * 10
         nodeWidth = max(100, min(textWidth, 200))
         self.rect = QRect(0,0,nodeWidth,50)
-        self.setFlag(QGraphicsItem.ItemIsMovable)
-        self.setFlag(QGraphicsItem.ItemIsSelectable)
-        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
         self.initUi()
 
         # Brush.
@@ -333,15 +340,20 @@ class NodeItem(QGraphicsItem):
         handled as connected attributes, but this way felt
         less intrusive.
         """
+        self.updating = True
+        
         x = self.node["pos.x"].value
         y = self.node["pos.y"].value
-        logger.debug("Setting pos: {}.{}".format(str(x),str(y)))
+        logger.debug("Setting pos: {} , {}".format(str(x),str(y)))
+        
         self.setPos(x, y)
 
         self.connectInputs()
 
         for socket in self.inputs + self.outputs:
             socket.positionChanged()
+        
+        self.updating = False
 
     def shape(self):
         path = QPainterPath()
@@ -378,6 +390,15 @@ class NodeItem(QGraphicsItem):
 
     def mouseMoveEvent(self, event):
         super(NodeItem, self).mouseMoveEvent(event)
+        if self.node and self.moving:
+            point = self.mapToScene(event.pos()) + self.mouseOffset
+            moveCommand = SetPositionCommand(   self,
+                                                self.oldPos.x(),
+                                                self.oldPos.y(),
+                                                point.x(),
+                                                point.y())
+            self.controller.undoStack.push(moveCommand)
+
         for output in self.outputs:
             for line in output.outLines:
                 #TODO: This feels silly..
@@ -389,12 +410,16 @@ class NodeItem(QGraphicsItem):
                 line.pointA = line.source.getCenter()
                 line.pointB = line.target.getCenter()
 
-    def itemChange(self, change, value):
-        if change == QGraphicsItem.ItemPositionHasChanged:
-            if self.node:
-                self.node["pos.x"] = self.pos().x()
-                self.node["pos.y"] = self.pos().y()
-        return QGraphicsItem.itemChange(self, change, value)
+    def mousePressEvent(self, event):
+        self.oldPos = self.pos()
+        self.mouseOffset = self.pos() - self.mapToScene(event.pos())
+        self.moving = True
+        return QGraphicsItem.mousePressEvent(self, event)
+
+    def mouseReleaseEvent(self, event):
+        self.oldPos = self.pos()
+        self.moving = False
+        return QGraphicsItem.mouseReleaseEvent(self, event)
 
     def connectInputs(self):
         for input in self.inputs:
@@ -448,8 +473,8 @@ class NodeItem(QGraphicsItem):
         return pos
 
 class SceneNodeItem(NodeItem):
-    def __init__(self, node):
-        super(SceneNodeItem, self).__init__(node)
+    def __init__(self, controller, node):
+        super(SceneNodeItem, self).__init__(controller, node)
         logger.debug("Creating SceneNodeItem")
        
         gradient = QLinearGradient(0,0,0,self.rect.height())
@@ -490,8 +515,8 @@ class SceneNodeItem(NodeItem):
         self.node.graph.graphChanged()
 
 class ActionNodeItem(NodeItem):
-    def __init__(self, node):
-        super(ActionNodeItem, self).__init__(node)
+    def __init__(self, controller, node):
+        super(ActionNodeItem, self).__init__(controller, node)
         logger.debug("Creating ActionNodeItem")
        
         gradient = QLinearGradient(0,0,0,self.rect.height())
@@ -533,8 +558,8 @@ class ActionNodeItem(NodeItem):
 
 
 class DataNodeItem(NodeItem):
-    def __init__(self, node):
-        super(DataNodeItem, self).__init__(node)
+    def __init__(self, controller, node):
+        super(DataNodeItem, self).__init__(controller, node)
         logger.debug("Creating DataNodeItem")
        
         gradient = QLinearGradient(0,0,0,self.rect.height())
