@@ -145,6 +145,7 @@ class NodeGraphView(QGraphicsView):
                     items.append(item)
                 else:
                     self.scene().removeItem(item)
+                    item.removedFromScene()
 
         for node in graph.nodes.values():
             if node in nodesInScene:

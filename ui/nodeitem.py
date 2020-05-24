@@ -127,6 +127,11 @@ class NodeSocket(QGraphicsItem):
         painter.setPen(self.pen)
         painter.drawEllipse(self.rect)
 
+    def itemRemovedFromScene(self, removeditem):
+        for line in self.outLines:
+            if line.target in removeditem.inputs:
+                self.scene().removeItem(line)
+
     def createNewLine(self, pos=QPointF(0,0)):
         """
         Creates a new line that isn't connected to anything yet.
@@ -382,6 +387,11 @@ class NodeItem(QGraphicsItem):
             socket.positionChanged()
         
         self.updating = False
+
+    def removedFromScene(self):
+        for input in self.inputs:
+            for line in input.inLines:
+                line.source.itemRemovedFromScene(self)
 
     def shape(self):
         path = QPainterPath()
