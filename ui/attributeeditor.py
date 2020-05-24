@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from core.attributes import *
+from .commands import *
 
 logger = logging.getLogger(__name__)
 
@@ -12,6 +13,8 @@ class AttributeEditor(QDockWidget):
 
     def __init__(self, parent=None):
         super(QDockWidget, self).__init__("Attribute Editor")
+        self.undoStack = parent.undoStack
+
         scrollArea = QScrollArea()
         
         widget = QWidget()
@@ -64,23 +67,23 @@ class AttributeEditor(QDockWidget):
         ## String widget
         if isinstance(attribute, StringAttribute):
             valueWidget = QLineEdit(str(attribute.value))
-            valueWidget.textChanged.connect(attribute.setValue)
-            valueWidget.textChanged.connect(self.attributeChanged)
+            valueWidget.textChanged.connect(
+                    lambda foo, attr=attribute: self.setAttribute(attr))
             layout.addWidget(valueWidget)
         ## Enum widget
         elif isinstance(attribute, EnumAttribute):
             valueWidget = QComboBox()
             valueWidget.addItems(attribute.elements)
             valueWidget.setCurrentText(str(attribute.value))
-            valueWidget.currentTextChanged.connect(attribute.setValue)
-            valueWidget.currentTextChanged.connect(self.attributeChanged)
+            valueWidget.currentTextChanged.connect(
+                    lambda foo, attr=attribute: self.setAttribute(attr))
             layout.addWidget(valueWidget)
         ## Bool widget
         elif isinstance(attribute, BoolAttribute):
             valueWidget = QCheckBox()
             valueWidget.setChecked(attribute.value)
-            valueWidget.stateChanged.connect(attribute.setValue)
-            valueWidget.stateChanged.connect(self.attributeChanged)
+            valueWidget.stateChanged.connect(
+                    lambda foo, attr=attribute: self.setAttribute(attr))
             layout.addWidget(valueWidget)
         else:
             layout.addWidget(QLabel(str(attribute.value)))
@@ -103,7 +106,6 @@ class AttributeEditor(QDockWidget):
         widget.setLayout(layout)
         return widget
 
-
     def clearLayout(self, layout):
         while layout.count():
             child = layout.takeAt(0)
@@ -111,3 +113,18 @@ class AttributeEditor(QDockWidget):
                 child.widget().deleteLater()
             elif child.layout():
                 self.clearLayout(child.layout())
+
+    def setAttribute(self, attribute):
+        command = SetAttributeCommand(  attribute,
+                                        attribute.value,
+                                        self.valueFromWidget(self.sender()))
+        self.undoStack.push(command)
+        self.attributeChanged.emit() 
+
+    def valueFromWidget(self, widget):
+        if isinstance(widget, QLineEdit):
+            return str(widget.text())
+        elif isinstance(widget, QComboBox):
+            return widget.currentIndex()
+        elif isinstance(widget, QCheckBox):
+            return widget.isChecked()

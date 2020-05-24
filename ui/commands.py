@@ -112,6 +112,7 @@ class SetAttributeCommand(QUndoCommand):
         self._attribute.value = self._newValue
         self._attribute.parent.graph.graphChanged()
 
+
 class SetPositionCommand(QUndoCommand):
     def __init__(self, item, oldX, oldY, newX, newY, parent=None):
         QUndoCommand.__init__(self, parent)
