@@ -536,11 +536,9 @@ class SceneNodeItem(NodeItem):
 
     def createAction(self, actionType):
         logger.debug("Attempting to create action: " + actionType)
-        action = self.node.createAction(actionType, "")
         pos = self.getOutputNodePos()
-        action["pos.x"] = pos.x()
-        action["pos.y"] = pos.y()
-        self.node.graph.graphChanged()
+        createCommand = CreateActionFromSceneCommand(self.node, actionType, pos)
+        self.controller.undoStack.push(createCommand)
 
 class ActionNodeItem(NodeItem):
     def __init__(self, controller, node):
@@ -575,15 +573,11 @@ class ActionNodeItem(NodeItem):
             dataMenu.addAction(action) 
         return menu
 
-
     def createData(self, datatype):
         logger.debug("Attempting to create data")
-        node = self.node.createData(datatype)
         pos = self.getOutputNodePos()
-        node["pos.x"] = pos.x()
-        node["pos.y"] = pos.y()
-        self.node.graph.graphChanged()
-
+        createCommand = CreateDataFromActionCommand(self.node, datatype, pos)
+        self.controller.undoStack.push(createCommand)
 
 class DataNodeItem(NodeItem):
     def __init__(self, controller, node):

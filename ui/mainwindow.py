@@ -212,7 +212,7 @@ class MainWindow(QMainWindow):
 
     def createNode(self, classname):
         createCommand = CreateNodeCommand(  classname, 
-                                            self.nodeGraph.shot, 
+                                            self.nodeGraph.shot.graph, 
                                             self.nodeGraph.mapToScene(self.nodeGraph.mousePosLocal))
         self.undoStack.push(createCommand)
 

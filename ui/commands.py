@@ -9,10 +9,10 @@ from PyQt5.QtWidgets import *
 logger = logging.getLogger(__name__)
 
 class CreateNodeCommand(QUndoCommand):
-    def __init__(self, classname, shot, pos, parent=None):
+    def __init__(self, classname, graph, pos, parent=None):
         QUndoCommand.__init__(self, parent)
         self._classname = classname
-        self._nodegraph = shot.graph
+        self._nodegraph = graph
         self._pos = pos        
         self._node = None
 
@@ -31,6 +31,57 @@ class CreateNodeCommand(QUndoCommand):
         self._node["pos.x"].value = self._pos.x()
         self._node["pos.y"].value = self._pos.y()
         self._nodegraph.graphChanged()
+
+class CreateDataFromActionCommand(QUndoCommand):
+    def __init__(self, node, dataType, pos, parent=None):
+        QUndoCommand.__init__(self, parent)
+        self._classname = dataType 
+        self._graph = node.graph
+        self._pos = pos
+        self._node = node
+        self._dataNode = None
+
+    def undo(self):
+        logger.info("Undoing Create Data from Action")
+        self._graph.removeNode(self._dataNode)
+        self._graph.graphChanged()
+
+    def redo(self):
+        logger.info("Creating Data from Action")
+        if self._dataNode:
+            self._graph.addNode(self._dataNode)
+        else:
+            self._dataNode = self._node.createData(self._classname)
+
+        self._dataNode["pos.x"].value = self._pos.x()
+        self._dataNode["pos.y"].value = self._pos.y()
+        self._graph.graphChanged()
+
+class CreateActionFromSceneCommand(QUndoCommand):
+    def __init__(self, node, actionType, pos, parent=None):
+        QUndoCommand.__init__(self, parent)
+        self._classname = actionType 
+        self._graph = node.graph
+        self._pos = pos
+        self._node = node
+        self._actionNode = None
+
+    def undo(self):
+        logger.info("Undoing Create Action from Node")
+        self._graph.removeNode(self._actionNode)
+        self._graph.graphChanged()
+
+    def redo(self):
+        logger.info("Creating Action from Node")
+        if self._actionNode:
+            self._graph.addNode(self._actionNode)
+        else:
+            self._actionNode = self._node.createAction(self._classname, "foo")
+
+        self._actionNode["pos.x"].value = self._pos.x()
+        self._actionNode["pos.y"].value = self._pos.y()
+        self._graph.graphChanged()
+
 
 class SetAttributeCommand(QUndoCommand):
     def __init__(self, attribute, oldValue, newValue, parent=None):
