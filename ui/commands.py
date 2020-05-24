@@ -97,6 +97,40 @@ class SetPositionCommand(QUndoCommand):
         self._node.graph.graphChanged()
 
 
+class CreateConnectionCommand(QUndoCommand):
+    def __init__(self, fromNode, toAttribute, parent=None):
+        QUndoCommand.__init__(self, parent)
+        self._toAttribute = toAttribute
+        self._fromNodeNew = fromNode
+        self._fromNodeOld = None
+        if toAttribute.value:
+            self._fromNode = toAttribute.value
+
+    def redo(self):
+        self._toAttribute.value = self._fromNodeNew
+        self._fromNodeNew.graph.graphChanged()
+
+    def undo(self):
+        self._toAttribute.value = self._fromNodeOld
+        self._fromNodeNew.graph.graphChanged()
+
+class AddConnectionCommand(QUndoCommand):
+    def __init__(self, fromNode, toAttribute, parent=None):
+        QUndoCommand.__init__(self, parent)
+        self._toAttrtibute = toAttribute
+        self._fromNodeNew = fromNode
+
+    def redo(self):
+        self._toAttribute.value.append(self._fromNode)
+        self._fromNode.graph.graphChanged()
+
+    def undo(self):
+        self._toAttribute.value.remove(self._fromNode)
+        self._fromNode.graph.graphChanged()
+
+
+
+
 class SwitchShotCommand(QUndoCommand):
     def __init__(self, fromShot, toShot, graphLabel, nodeGraph, shotBrowser, parent=None):
         QUndoCommand.__init__(self, parent)

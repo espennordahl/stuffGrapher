@@ -164,6 +164,7 @@ class NodeSocket(QGraphicsItem):
         elif isinstance(self.attribute, InputAttribute):
             self.newLine.pointA = point
 
+
     def connectToItem(self, item):
         """
         Attempts to connect two items to eachother.
@@ -241,11 +242,38 @@ class NodeSocket(QGraphicsItem):
         logger.debug("Mouse Released")
         item = self.scene().itemAt(event.scenePos().toPoint(), QTransform())
         if isinstance(item, NodeSocket):
-            self.connectToItem(item)
+            self.attemptConnection(item)
         elif item is self.newLine:
             self.showCreateNodeMenu(event)
         if self.newLine:
             self.removeNewLine()
+
+
+    def attemptConnection(self, item):
+        ## Check that we're actually dealing with an input/output pair
+        if isinstance(self.attribute, OutputAttribute) and isinstance(item.attribute, InputAttribute):
+            fro = self
+            to = item
+        elif isinstance(self.attribute, InputAttribute) and isinstance(item.attribute, OutputAttribute):
+            fro = item
+            to = self
+        else:
+            logger.debug("Items not input/output pair")
+            return
+
+        ## Check legality
+        if not to.attribute.isLegalConnection(fro.attribute):
+            logger.debug("Illegal connection")
+            return
+
+        
+        if isinstance(to.attribute, ArrayInputAttribute):
+            command = AddConnectionCommand(fro.parentItem().node, to.attribute)
+        else:
+            command = CreateConnectionCommand(fro.parentItem().node, to.attribute)
+        
+        self.parent.controller.undoStack.push(command)
+
 
     def showCreateNodeMenu(self, event):
         menu = self.parent.createNodeMenu(self, event)
