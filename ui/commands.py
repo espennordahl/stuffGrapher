@@ -181,7 +181,26 @@ class AddConnectionCommand(QUndoCommand):
         self._fromNode.graph.graphChanged()
 
 
+class SelectNodesCommand(QUndoCommand):
+    def __init__(self, controller, oldSelection, newSelection, parent=None):
+        QUndoCommand.__init__(self, parent)
+        self._controller = controller
+        self._oldSelection = oldSelection
+        self._newSelection = newSelection
 
+    def redo(self):
+        selectedNodes = []
+        for item in self._newSelection:
+            item.setSelected(True)
+            selectedNodes.append(item.node)
+        self._controller.selectionChanged.emit(selectedNodes)
+
+    def undo(self):
+        selectedNodes = []
+        for item in self._oldSelection:
+            item.setSelected(True)
+            selectedNodes.append(item.node)
+        self._controller.selectionChanged.emit(selectedNodes)
 
 class SwitchShotCommand(QUndoCommand):
     def __init__(self, fromShot, toShot, graphLabel, nodeGraph, shotBrowser, parent=None):

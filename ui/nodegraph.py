@@ -21,6 +21,7 @@ class NodeGraphView(QGraphicsView):
         self.undoStack = parent.undoStack
         self.nodes = []
         self.shot = None
+        self.oldSelection = []
         self.mousePosLocal = QPoint(0,0)
         self.mousePosGlobal = QPoint(0,0)
 
@@ -55,6 +56,8 @@ class NodeGraphView(QGraphicsView):
         else:
             return super(NodeGraphView, self).event(event)
 
+
+
     def createNodeMenu(self, pos):
         menu = QMenu()
         self.mainWindow.buildCreateNodeMenu(menu)
@@ -68,7 +71,18 @@ class NodeGraphView(QGraphicsView):
             if hasattr(item, "node"):
                 if isinstance(item.node, Node):
                     selectedNodes.append(item.node)
-        self.selectionChanged.emit(selectedNodes)
+
+        if selectedNodes != self.oldSelection:
+            oldSelectionItems = []
+            for item in scene.items():
+                if hasattr(item, "node"):
+                    if isinstance(item.node, Node):
+                        if item.node in self.oldSelection:
+                            oldSelectionItems.append(item)
+            command = SelectNodesCommand(self, oldSelectionItems, selection)
+            self.undoStack.push(command)
+            self.oldSelection = selectedNodes
+            #self.selectionChanged.emit(selectedNodes)
 
     def createNode(self, classname):
         if not self.shot:
